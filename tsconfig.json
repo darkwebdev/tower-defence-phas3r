@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "sourceMap": true,
+//    "noImplicitAny": true,
+//    "strictNullChecks": true,
+    "allowJs": false,
+    "checkJs": false,
+//    "strict": true,
+    "module": "esnext",
+    "target": "es2018",
+    "moduleResolution": "node",
+    "baseUrl": "."
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude": [
+    "./node_modules/"
+  ],
+  "lib": [ "dom", "es2017" ],
+  "paths": {
+    "*": [
+      "@types/*"
+    ]
+  }
+}

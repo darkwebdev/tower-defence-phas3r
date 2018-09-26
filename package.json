@@ -1,0 +1,25 @@
+{
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "yarn build && yarn watch",
+    "build": "yarn webpack --config=webpack.dev.js",
+    "build:prod": "yarn webpack --config=webpack.prod.js",
+    "watch": "yarn webpack-dev-server --progress --config=webpack.dev.js",
+    "start": "yarn webpack-dev-server --open --config=webpack.dev.js"
+  },
+  "dependencies": {
+    "phaser": "^3"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "copy-webpack-plugin": "^4.5.2",
+    "html-webpack-plugin": "^3.2.0",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^5.2.0",
+    "typescript": "^3.0.3",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.1.8",
+    "webpack-merge": "^4.1.4"
+  }
+}
