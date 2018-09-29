@@ -1,4 +1,4 @@
-import { Scene, Physics, GameObjects } from 'phaser'
+import { Scene, Physics, GameObjects, Math } from 'phaser'
 import HealthBar from './health-bar'
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   key?: string
 }
 
-const SPEED: number = 20;
+const SPEED: number = 1/10000;
 
 export default class Enemy extends GameObjects.Sprite {
   scene: Scene;
@@ -22,6 +22,8 @@ export default class Enemy extends GameObjects.Sprite {
   damage: number;
   speed: number;
   key: string;
+  pathT: number;
+  pathVec: Math.Vector2;
   
   constructor({ scene, x, y, height = 30, width = 30, hp = 100, damage = 10, key = 'generic enemy' }: Props) {
     super(scene, x, y, key);
@@ -32,12 +34,17 @@ export default class Enemy extends GameObjects.Sprite {
     this.damage = damage;
     this.speed = SPEED;
     this.key = key;
+    this.pathT = 0;
+    this.pathVec = new Math.Vector2();
 
     this.scene.physics.world.enable(this);
   }
 
-  update(this: Enemy & GameObjects.GameObject): void {
-    console.log('ENEMY UPDATE')
+  update(this: Enemy & GameObjects.GameObject, time: number, delta: number): void {
+    this.pathT += this.speed * delta;
+    this.scene.path.getPoint(this.pathT, this.pathVec);
+    this.setPosition(this.pathVec.x, this.pathVec.y);
+    // console.log('ENEMY UPDATE', this.pathT, this.pathVec, this.x, this.y)
   }
   
   onHit(this: Enemy & GameObjects.GameObject, damage: number) {

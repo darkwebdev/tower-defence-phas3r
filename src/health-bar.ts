@@ -1,4 +1,4 @@
-import {GameObjects} from 'phaser';
+import { GameObjects } from 'phaser';
 
 const BORDER_THICKNESS = 1;
 const BORDER_COLOR = 0x000000;
