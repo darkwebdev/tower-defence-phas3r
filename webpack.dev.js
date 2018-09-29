@@ -14,7 +14,7 @@ module.exports = merge(common, {
     port: 8080,
     // hot: true,
     open: false,
-    // contentBase: 'public',
+    contentBase: 'dist',
     watchOptions: {
       ignored: ['assets', 'node_modules', 'dist', 'build']
     }

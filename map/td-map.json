@@ -42,18 +42,6 @@
          "name":"allies",
          "objects":[
                 {
-                 "gid":4,
-                 "height":64,
-                 "id":1,
-                 "name":"sentry",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":192,
-                 "y":384
-                }, 
-                {
                  "gid":3,
                  "height":64,
                  "id":2,
@@ -70,9 +58,44 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":4,
+         "name":"towers",
+         "objects":[
+                {
+                 "gid":4,
+                 "height":64,
+                 "id":1,
+                 "name":"tower",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":192,
+                 "y":384
+                }, 
+                {
+                 "gid":4,
+                 "height":64,
+                 "id":5,
+                 "name":"laser tower",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":128,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":5,
+ "nextlayerid":5,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.0",
