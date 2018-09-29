@@ -1,6 +1,7 @@
-import { GameObjects, Physics, Scene, Tilemaps, Time } from 'phaser';
+import {GameObjects, Physics, Scene, Tilemaps, Time} from 'phaser';
 import Enemy from './enemy';
-import Tower from "./tower";
+import BulletTower from './tower-bullet';
+import LaserTower from './tower-laser';
 
 export default class TdScene extends Scene {
   text: GameObjects.Text;
@@ -44,10 +45,18 @@ export default class TdScene extends Scene {
     console.log(enemies)
     const homes: GameObjects.Sprite[] = tilemap.createFromObjects('allies', 'home', {});
 
-    const towerGid = 4;
-    const towers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', towerGid, {});
-    towers.forEach(t => {
-      this.spawnTower(t);
+    const bulletTowers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', 'Bullet tower', {});
+    bulletTowers.forEach(({ x, y }) => {
+      const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+      this.towers.add(tower);
+      console.log('New bullet tower spawned', tower.key)
+    });
+
+    const laserTowers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', 'Laser tower', {});
+    laserTowers.forEach(({ x, y }) => {
+      const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+      this.towers.add(tower);
+      console.log('New laser tower spawned', tower.key)
     });
     
     const enemyTemplate: GameObjects.Sprite = enemies[0];
@@ -107,14 +116,6 @@ export default class TdScene extends Scene {
     console.log('New enemy spawned', enemy.key)
   }
 
-  spawnTower({ x, y, width, height }: GameObjects.Sprite): void {
-    const tower = new Tower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-    
-    this.towers.add(tower);
-
-    console.log('New tower spawned', tower.key)
-  }
-  
   onEnemySpawn(this: Scene & TdScene, enemy: Enemy): void {
     console.log('Enemy spawned', enemy.key)
     this.physics.moveToObject(enemy, this.home, enemy.speed);

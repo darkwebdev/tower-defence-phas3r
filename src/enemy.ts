@@ -34,7 +34,7 @@ export default class Enemy extends GameObjects.Sprite {
   }
 
   update(this: Enemy & GameObjects.GameObject): void {
-    // console.log('ENEMY UPDATE')
+    console.log('ENEMY UPDATE')
   }
   
   onHit(damage: number) {
@@ -46,9 +46,10 @@ export default class Enemy extends GameObjects.Sprite {
     console.log('I am home', this.key)
   }
 
-  destroy() {
-    console.log('I am destroyed', this.key)
+  destroy(this: Enemy & GameObjects.GameObject) {
+    console.log('/ENEMY', this.key)
     this.collider.destroy();
     this.scene.physics.world.disable(this);
+    this.setActive(false);
   }
 }
