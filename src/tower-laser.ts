@@ -1,6 +1,8 @@
-import {GameObjects, Scene, Geom} from 'phaser'
+import { GameObjects, Scene } from 'phaser'
 import Enemy from './enemy'
-import Tower, { TowerType } from './tower';
+import Tower from './tower';
+
+const FPS = 60;
 
 type Props = {
   scene: Scene,
@@ -10,38 +12,35 @@ type Props = {
 }
 
 export default class LaserTower extends Tower {
-  scene: Scene;
   key: string;
   radius: number;
   dps: number;
-  laserGraphics: GameObjects.Graphics;
-  laserLine: Geom.Line;
+  laser: GameObjects.Graphics;
   target: Enemy;
 
   constructor({ scene, x, y, key = 'bullet-tower' }: Props) {
     super({ scene, x, y, key });
 
-    this.scene = scene;
+    this.laser = scene.add.graphics({ lineStyle: { width: 2, color: 0xFF0000 } });
     this.key = key;
+    this.radius = 200;
+    this.dps = 10;
 
     this.init();
   }
 
   init(this: LaserTower & GameObjects.Sprite) {
-    this.radius = 200;
-    this.dps = 50;
-    this.laserGraphics = this.scene.add.graphics({lineStyle: {width: 2, color: 0xFF0000}});
   }
 
   update(this: LaserTower & GameObjects.Sprite, time: number, delta: number) {
     super.update(time, delta);
 
-    this.laserGraphics.clear();
+    this.laser.clear();
 
     if (this.target && this.target.active) {
       console.log('LASER on', this.target)
-      this.laserGraphics.lineBetween(this.x, this.y, this.target.x, this.target.y);
-      this.target.onHit(this.dps / 60);
+      this.laser.lineBetween(this.x, this.y, this.target.x, this.target.y);
+      this.target.onHit(this.dps / FPS);
     }
   }
 

@@ -27,7 +27,7 @@ export default class BulletTower extends Tower {
     this.key = key;
     this.lastFired = 0;
     this.radius = 100;
-    this.dps = 100;
+    this.dps = 5;
     
     this.init();
   }

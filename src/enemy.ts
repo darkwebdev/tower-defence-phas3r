@@ -1,4 +1,5 @@
 import { Scene, Physics, GameObjects } from 'phaser'
+import HealthBar from './health-bar'
 
 type Props = {
   scene: Scene,
@@ -17,15 +18,17 @@ export default class Enemy extends GameObjects.Sprite {
   scene: Scene;
   collider: Physics.Arcade.Collider;
   hp: number;
+  healthBar: HealthBar;
   damage: number;
   speed: number;
   key: string;
   
-  constructor({ scene, x, y, height, width, hp = 50, damage = 10, key = 'generic enemy' }: Props) {
+  constructor({ scene, x, y, height = 30, width = 30, hp = 100, damage = 10, key = 'generic enemy' }: Props) {
     super(scene, x, y, key);
     
     this.scene = scene;
     this.hp = hp;
+    this.healthBar = new HealthBar(scene, hp, x-height, y+width);
     this.damage = damage;
     this.speed = SPEED;
     this.key = key;
@@ -37,8 +40,9 @@ export default class Enemy extends GameObjects.Sprite {
     console.log('ENEMY UPDATE')
   }
   
-  onHit(damage: number) {
+  onHit(this: Enemy & GameObjects.GameObject, damage: number) {
     this.hp -= damage;
+    this.healthBar.setTo(this.hp, this.x - this.height, this.y + this.width);
     console.log('hp', this.hp, this.key)
   }
   
@@ -51,5 +55,6 @@ export default class Enemy extends GameObjects.Sprite {
     this.collider.destroy();
     this.scene.physics.world.disable(this);
     this.setActive(false);
+    this.healthBar.destroy();
   }
 }

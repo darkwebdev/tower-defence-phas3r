@@ -30,7 +30,7 @@ export default class Bullet extends GameObjects.Image {
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.speed = 50;
+    this.speed = 100;
     this.damage = 5;
     this.key = key;
 
