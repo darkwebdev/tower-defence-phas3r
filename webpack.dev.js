@@ -1,4 +1,5 @@
 const merge = require('webpack-merge');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
@@ -6,9 +7,12 @@ module.exports = merge(common, {
   
   devtool: 'inline-source-map',
 
-  // externals: {
-  //   phaser: 'Phaser'
-  // },
+  plugins: [
+    new CopyWebpackPlugin([
+      { from: 'map', to: 'map'},
+      { from: 'images', to: 'images'},
+    ], {})
+  ],
   
   devServer: {
     port: 8080,

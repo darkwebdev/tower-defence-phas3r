@@ -155,7 +155,6 @@ export default class SceneGame extends Scene {
 
   onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
     console.log('Enemy spawned', enemy.key)
-    // this.physics.moveToObject(enemy, this.home, enemy.speed);
     enemy.collider = this.physics.add.overlap(
       enemy,
       this.home,
@@ -176,22 +175,11 @@ export default class SceneGame extends Scene {
   }
 
   attachKeyHandlers(this: SceneGame & Scene) {
-    // this.input.keyboard.on('keydown_Escape', () => {
-    //   console.log('MENU');
-    //   // this.scene.pause(); //sleep???
-    //   this.scene.switch('scene-menu');
-    // });
-
     this.input.keyboard.on('keydown', event => {
-      // console.log(event);
       switch(event.code) {
         case 'Escape':
           console.log('ESC');
-          // this.scene.pause();
-          // this.scene.start('scene-menu');
-          // this.scene.bringToTop('scene-menu');
           this.events.emit(ActionTypes.SHOW_MENU);
-          // this.store.dispatch({ type: Actions.PAUSE });
           break;
       }
     });
