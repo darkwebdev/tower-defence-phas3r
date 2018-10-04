@@ -1,9 +1,17 @@
-import { GameObjects, Physics, Scene, Tilemaps, Time, Curves } from 'phaser';
-import Enemy from './enemy';
-import BulletTower from './tower-bullet';
-import LaserTower from './tower-laser';
+import { GameObjects, Physics, Scene, Tilemaps, Time, Curves, Input } from 'phaser'
+import Enemy from '../entities/enemy'
+import BulletTower from '../entities/tower/tower-bullet'
+import LaserTower from '../entities/tower/tower-laser'
+import { ActionTypes } from '../actions';
 
-export default class TdScene extends Scene {
+const FONT = '18px monospace';
+const TEXT_PADDING = { x: 20, y: 10 };
+const TEXT_COLOR = '#ffffff';
+const TEXT_BG = '#000000';
+
+export const SCENE_KEY = 'scene-game';
+
+export default class SceneGame extends Scene {
   text: GameObjects.Text;
   textPool: GameObjects.Text;
   hp: number;
@@ -14,15 +22,24 @@ export default class TdScene extends Scene {
   enemyRespawn: Time.TimerEvent;
   waveSize: number;
   path: Curves.Path;
+  
+  constructor() {
+    console.log('Called:', 'constructor', arguments);
+    super({
+      key: SCENE_KEY,
+      active: false,
+      // plugins: [ 'Input', 'Loader', 'Time' ]
+    });
+  }
 
-  preload(this: Scene & TdScene): void {
+  preload(this: Scene & SceneGame) {
     this.load.image('tiles', 'map/td.png');
     this.load.tilemapTiledJSON('level1', 'map/td-map.json');
     this.load.image('enemy', 'images/enemy.png');
     this.load.image('bullet', 'images/bullet.png');
   }
 
-  init(this: Scene & TdScene): void {
+  init(this: Scene & SceneGame) {
     this.enemies = this.add.group({
       runChildUpdate: true,
       createCallback: this.onEnemySpawn.bind(this),
@@ -35,7 +52,7 @@ export default class TdScene extends Scene {
     this.waveSize = 2;
   }
   
-  create(this: Scene & TdScene): void {
+  create(this: Scene & SceneGame) {
     const tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
     
     this.createPath(tilemap);
@@ -45,9 +62,10 @@ export default class TdScene extends Scene {
     this.createEnemies(tilemap);
 
     this.createText();
+    this.attachKeyHandlers();
   }
 
-  update(time: number, delta: number): void {
+  update(time: number, delta: number) {
     if (this.gameOver) return;
 
     this.enemies.getChildren().forEach(e => {
@@ -61,7 +79,7 @@ export default class TdScene extends Scene {
     }
   }
   
-  createHome(this: Scene, tilemap: Tilemaps.Tilemap) {
+  createHome(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
     const homes: GameObjects.Sprite[] = tilemap.createFromObjects('allies', 'home', {});
     const homeTemplate = homes[0];
     this.home = this.physics.add
@@ -71,7 +89,7 @@ export default class TdScene extends Scene {
     this.hp = 100;
   }
   
-  createTowers(this: Scene, tilemap: Tilemaps.Tilemap) {
+  createTowers(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
     const bulletTowers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', 'Bullet tower', {});
     bulletTowers.forEach(({ x, y }) => {
       const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
@@ -87,7 +105,7 @@ export default class TdScene extends Scene {
     });
   }
 
-  createEnemies(this: Scene, tilemap: Tilemaps.Tilemap) {
+  createEnemies(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
     const enemies = tilemap.createFromObjects('enemies', 'enemy', {});
     const enemyTemplate: GameObjects.Sprite = enemies[0];
 
@@ -105,9 +123,9 @@ export default class TdScene extends Scene {
     console.log('New enemy spawned', enemy.key)
   }
   
-  createPath(this: Scene, tilemap: Tilemaps.Tilemap) {
+  createPath(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
     const tileset: Tilemaps.Tileset = tilemap.addTilesetImage('td', 'tiles');
-    const layerTerrain = tilemap.createStaticLayer("terrain", tileset, 0, 0);
+    tilemap.createStaticLayer("terrain", tileset, 0, 0);
 
     this.path = this.add.path(96, -32);
     this.path.lineTo(96, 164);
@@ -119,27 +137,23 @@ export default class TdScene extends Scene {
     this.path.draw(graphics);
   }
   
-  createText(this: Scene) {
+  createText(this: SceneGame & Scene) {
+    const textStyle = {
+      font: FONT,
+      fill: TEXT_BG,
+      padding: TEXT_PADDING,
+      backgroundColor: TEXT_COLOR
+    };
     this.text = this.add
-      .text(16, 16, 'Enemy is coming!', {
-        font: "18px monospace",
-        fill: "#000000",
-        padding: { x: 20, y: 10 },
-        backgroundColor: "#ffffff"
-      })
+      .text(16, 16, 'Enemy is coming!', textStyle)
       .setScrollFactor(0);
 
     this.textPool = this.add
-      .text(16, 64, 'Bullet pool', {
-        font: "18px monospace",
-        fill: "#000000",
-        padding: { x: 20, y: 10 },
-        backgroundColor: "#ffffff"
-      })
+      .text(16, 64, 'Bullet pool', textStyle)
       .setScrollFactor(0);
   }
 
-  onEnemySpawn(this: Scene & TdScene, enemy: Enemy): void {
+  onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
     console.log('Enemy spawned', enemy.key)
     // this.physics.moveToObject(enemy, this.home, enemy.speed);
     enemy.collider = this.physics.add.overlap(
@@ -159,6 +173,28 @@ export default class TdScene extends Scene {
 
     enemy.onEnterHome();
     this.enemies.remove(<any>enemy, true, true);
+  }
+
+  attachKeyHandlers(this: SceneGame & Scene) {
+    // this.input.keyboard.on('keydown_Escape', () => {
+    //   console.log('MENU');
+    //   // this.scene.pause(); //sleep???
+    //   this.scene.switch('scene-menu');
+    // });
+
+    this.input.keyboard.on('keydown', event => {
+      // console.log(event);
+      switch(event.code) {
+        case 'Escape':
+          console.log('ESC');
+          // this.scene.pause();
+          // this.scene.start('scene-menu');
+          // this.scene.bringToTop('scene-menu');
+          this.events.emit(ActionTypes.SHOW_MENU);
+          // this.store.dispatch({ type: Actions.PAUSE });
+          break;
+      }
+    });
   }
 }
 

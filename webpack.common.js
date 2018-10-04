@@ -14,24 +14,36 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
-        commons: {
+        phaser: {
           test: /node_modules\/phaser/,
           name: 'phaser',
-          chunks: 'all'
-
+          chunks: 'all',
+          reuseExistingChunk: true
+        },
+        react: {
+          test: /node_modules\/react/,
+          name: 'react',
+          chunks: 'all',
+          reuseExistingChunk: true
         }
       }
     }
   },
 
   resolve: {
-    extensions: [ '.ts', '.js', '.json' ]
+    extensions: [ '.ts', '.tsx', '.js', '.json', '.less' ]
   },
 
   module: {
     rules: [
+      { test: /\.less$/, use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          { loader: 'less-loader' }
+        ]
+      },
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
         options: {
@@ -55,7 +67,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './src/index.html',
-      chunks: ['phaser', 'main'],
+      chunks: ['phaser', 'react', 'main'],
       // chunksSortMode: 'manual',
       minify: {
         removeAttributeQuotes: false,

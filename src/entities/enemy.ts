@@ -1,5 +1,5 @@
 import { Scene, Physics, GameObjects, Math } from 'phaser'
-import HealthBar from './health-bar'
+import HealthBar from '../ui/health-bar'
 
 type Props = {
   scene: Scene,

@@ -1,7 +1,7 @@
 import {GameObjects, Scene} from 'phaser'
-import Enemy from './enemy'
-import Bullet from './bullet'
-import Tower, { TowerType } from './tower';
+import Enemy from '../enemy'
+import Bullet from '../bullet'
+import Tower from '.';
 
 type Props = {
   scene: Scene,

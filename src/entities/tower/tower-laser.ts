@@ -1,6 +1,6 @@
 import { GameObjects, Scene } from 'phaser'
-import Enemy from './enemy'
-import Tower from './tower';
+import Enemy from '../enemy'
+import Tower from '.';
 
 const FPS = 60;
 
@@ -38,7 +38,7 @@ export default class LaserTower extends Tower {
     this.laser.clear();
 
     if (this.target && this.target.active) {
-      console.log('LASER on', this.target)
+      console.log('LASER on', this.target.key)
       this.laser.lineBetween(this.x, this.y, this.target.x, this.target.y);
       this.target.onHit(this.dps / FPS);
     }

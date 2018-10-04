@@ -1,0 +1,33 @@
+menu {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  width: 640px;
+  height: 640px;
+  
+  &[hidden] {
+    display: none;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    filter: blur(1);
+    z-index: -1;
+  }
+  
+  button {
+    padding: 1em;
+    margin: 0.5em;
+    width: 12em;
+    font-size: 1.3rem;
+    border-radius: 0.5em;
+  }
+}

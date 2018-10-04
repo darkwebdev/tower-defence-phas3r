@@ -34,6 +34,8 @@ export default class Bullet extends GameObjects.Image {
     this.damage = 5;
     this.key = key;
 
+    // graphics.fillStyle(0xff0000, 1);
+    // graphics.fillCircle(this.x, this.y, 5);
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
   }
@@ -66,8 +68,8 @@ export default class Bullet extends GameObjects.Image {
   }
   
   destroy(this: Bullet & GameObjects.Image): void {
-    console.log('/BULLET', this.key)
-    this.collider.destroy();
+    console.log('/BULLET', this.key, this.collider)
+    if (this.collider.active) this.collider.destroy();
     this.scene.physics.world.disable(this);
     // this.scene.remove(this);
   }

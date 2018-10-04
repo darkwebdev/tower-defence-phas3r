@@ -1,13 +1,7 @@
 import {GameObjects, Math as PMath, Scene} from 'phaser'
-import Enemy from './enemy'
-
-const enum TowerType {
-  BulletTower,
-  LaserTower
-}
+import Enemy from '../enemy'
 
 type Props = {
-  // towerType: TowerType,
   scene: Scene,
   x: number,
   y: number,
@@ -23,7 +17,6 @@ type EnemyWithDistance = {
 }
 
 abstract class Tower extends GameObjects.Sprite {
-  // towerType: TowerType;
   scene: Scene;
   key: string;
   radius: number;
@@ -31,7 +24,6 @@ abstract class Tower extends GameObjects.Sprite {
   constructor({ scene, x, y, key = 'tower' }: Props) {
     super(scene, x, y, key);
     
-    // this.towerType = towerType;
     this.scene = scene;
     this.key = key;
     
@@ -74,7 +66,3 @@ abstract class Tower extends GameObjects.Sprite {
 }
 
 export default Tower;
-
-export {
-  TowerType
-};
