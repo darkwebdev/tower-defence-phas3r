@@ -30,6 +30,8 @@ const game = new Game({
     postBoot() {
       scene = game.scene.getScene(SCENE_KEY);
       
+      renderUI();
+      
       scene.events.on(ActionTypes.SHOW_MENU, () => {
         store.dispatch(showMenu(scene.scene));
       });
@@ -38,7 +40,6 @@ const game = new Game({
 });
 
 //game.scene.add(SCENE_KEY, SceneGame);
-// renderUI();
 
 function renderUI() {
   const state: State = store.getState();

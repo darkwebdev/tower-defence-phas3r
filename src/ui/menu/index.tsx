@@ -1,5 +1,13 @@
 import * as React from 'react'
-import './menu.less'
+import './styles.less'
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'ui-menu': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    }
+  }
+}
 
 type Props = {
   hidden?: boolean;
@@ -34,7 +42,7 @@ export default class Menu extends React.Component<Props> {
     const { hidden, onReturn, onRestart } = this.props;
     
     return (
-      <menu
+      <ui-menu
         hidden={hidden}
         onKeyDown={this.returnOnEsc.bind(this)}
         tabIndex={0}
@@ -44,7 +52,7 @@ export default class Menu extends React.Component<Props> {
         <button onClick={onRestart}>Restart</button>
         <button disabled>Options</button>
         <button disabled>Exit</button>
-      </menu>
+      </ui-menu>
     );
   }
 }

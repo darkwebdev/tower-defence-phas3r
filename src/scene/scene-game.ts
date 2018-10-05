@@ -22,6 +22,7 @@ export default class SceneGame extends Scene {
   enemyRespawn: Time.TimerEvent;
   waveSize: number;
   path: Curves.Path;
+  tilemap: Tilemaps.Tilemap;
   
   constructor() {
     console.log('Called:', 'constructor', arguments);
@@ -53,16 +54,17 @@ export default class SceneGame extends Scene {
   }
   
   create(this: Scene & SceneGame) {
-    const tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
+    this.tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
     
-    this.createPath(tilemap);
-    this.createHome(tilemap);
+    this.createPath();
+    this.createHome();
     
-    this.createTowers(tilemap);
-    this.createEnemies(tilemap);
+    this.createTowers();
+    this.createEnemies();
 
     this.createText();
     this.attachKeyHandlers();
+    this.attachEventHandlers();
   }
 
   update(time: number, delta: number) {
@@ -79,8 +81,8 @@ export default class SceneGame extends Scene {
     }
   }
   
-  createHome(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
-    const homes: GameObjects.Sprite[] = tilemap.createFromObjects('allies', 'home', {});
+  createHome(this: SceneGame & Scene) {
+    const homes: GameObjects.Sprite[] = this.tilemap.createFromObjects('allies', 'home', {});
     const homeTemplate = homes[0];
     this.home = this.physics.add
       .image(homeTemplate.x, homeTemplate.y, 'enemy')
@@ -89,15 +91,15 @@ export default class SceneGame extends Scene {
     this.hp = 100;
   }
   
-  createTowers(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
-    const bulletTowers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', 'Bullet tower', {});
+  createTowers(this: SceneGame & Scene) {
+    const bulletTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Bullet tower', {});
     bulletTowers.forEach(({ x, y }) => {
       const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
       this.towers.add(tower);
       console.log('New bullet tower spawned', tower.key)
     });
 
-    const laserTowers: GameObjects.Sprite[] = tilemap.createFromObjects('towers', 'Laser tower', {});
+    const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
     laserTowers.forEach(({ x, y }) => {
       const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
       this.towers.add(tower);
@@ -105,8 +107,8 @@ export default class SceneGame extends Scene {
     });
   }
 
-  createEnemies(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
-    const enemies = tilemap.createFromObjects('enemies', 'enemy', {});
+  createEnemies(this: SceneGame & Scene) {
+    const enemies = this.tilemap.createFromObjects('enemies', 'enemy', {});
     const enemyTemplate: GameObjects.Sprite = enemies[0];
 
     this.enemyRespawn = this.time.addEvent({
@@ -123,9 +125,9 @@ export default class SceneGame extends Scene {
     console.log('New enemy spawned', enemy.key)
   }
   
-  createPath(this: SceneGame & Scene, tilemap: Tilemaps.Tilemap) {
-    const tileset: Tilemaps.Tileset = tilemap.addTilesetImage('td', 'tiles');
-    tilemap.createStaticLayer("terrain", tileset, 0, 0);
+  createPath(this: SceneGame & Scene) {
+    const tileset: Tilemaps.Tileset = this.tilemap.addTilesetImage('td', 'tiles');
+    this.tilemap.createStaticLayer("terrain", tileset, 0, 0);
 
     this.path = this.add.path(96, -32);
     this.path.lineTo(96, 164);
@@ -174,6 +176,39 @@ export default class SceneGame extends Scene {
     this.enemies.remove(<any>enemy, true, true);
   }
 
+  activateAddTowerMode(this: SceneGame & Scene) {
+    const tileWidth = this.tilemap.tileWidth;
+    const tileHeight = this.tilemap.tileHeight;
+    
+    const marker = this.add.graphics();
+    marker.lineStyle(3, 0xff0000, 1);
+    marker.strokeRect(0, 0, tileWidth, tileHeight);
+
+    this.input.on('pointermove', (pointer: Input.Pointer) => {
+      const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(pointer.x, pointer.y);
+
+      if (tile) {
+        marker.x = tile.pixelX;
+        marker.y = tile.pixelY;
+      }
+    });
+
+    this.input.on('pointerdown', (pointer: Input.Pointer) => {
+      const x = marker.x + tileWidth/2;
+      const y = marker.y + tileHeight/2;
+      const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+      this.towers.add(tower);
+      console.log('New bullet tower spawned', tower.key)
+    })
+  }
+  
+  attachEventHandlers(this: SceneGame & Scene) {
+    this.events.on('add-tower', () => {
+      console.log('Entering add-tower mode...')
+      this.activateAddTowerMode();
+    })
+  }
+  
   attachKeyHandlers(this: SceneGame & Scene) {
     this.input.keyboard.on('keydown', event => {
       switch(event.code) {

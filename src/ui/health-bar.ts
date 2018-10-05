@@ -10,6 +10,11 @@ export default class HealthBar extends GameObjects.GameObject {
   bar: GameObjects.Graphics;
   value: number;
   maxValue: number;
+  x: number;
+  y: number;
+  
+  width = 50;
+  height = 5;
 
   constructor(scene, maxValue, x, y) {
     super(scene, 'health-bar');
@@ -18,8 +23,6 @@ export default class HealthBar extends GameObjects.GameObject {
 
     this.x = x;
     this.y = y;
-    this.width = 50;
-    this.height = 5;
     this.maxValue = maxValue;
     this.value = maxValue;
 

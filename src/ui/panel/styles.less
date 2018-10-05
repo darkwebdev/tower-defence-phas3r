@@ -1,0 +1,24 @@
+ui-panel {
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  top: calc(640px - 50px);
+  height: 50px;
+  left: 0;
+  right: calc(100% - 640px);
+  background: rgba(255,255,255, .5);
+  
+  &[hidden="true"] {
+    left: calc(640px - 50px);
+  }
+  
+  button {
+    width: 50px;
+    border-radius: 5px;
+    margin: 3px;
+    
+    [hidden="true"] {
+      display: none;
+    }
+  }
+}

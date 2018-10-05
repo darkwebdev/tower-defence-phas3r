@@ -10,6 +10,14 @@ export default function (state: State, action: Action): State {
       return { ...state, gamePaused: true, menuVisible: true };
       break;
 
+    case ActionTypes.HIDE_PANEL:
+      return { ...state, panelVisible: false };
+      break;
+
+    case ActionTypes.SHOW_PANEL:
+      return { ...state, panelVisible: true };
+      break;
+
     case ActionTypes.RESUME:
       return { ...state, gamePaused: false, menuVisible: false };
       break;

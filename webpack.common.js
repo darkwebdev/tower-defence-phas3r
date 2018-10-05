@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
+const { WatchIgnorePlugin } = require('webpack');
 
 module.exports = {
   entry: './src/index.ts',
@@ -60,7 +60,7 @@ module.exports = {
   },
   
   plugins: [
-    new webpack.WatchIgnorePlugin([
+    new WatchIgnorePlugin([
       /\.js$/,
       /\.d\.ts$/
     ]),
