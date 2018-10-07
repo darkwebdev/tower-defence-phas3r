@@ -1,4 +1,4 @@
-import { Curves, GameObjects, Physics, Scene, Tilemaps, Time } from 'phaser'
+import { Curves, GameObjects, Physics, Scene, Tilemaps, Time, Math } from 'phaser'
 import Enemy from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
@@ -181,8 +181,10 @@ export default class SceneGame extends Scene {
 
   enterAddTowerMode(this: SceneGame & Scene, type: TowerTypes) {
     this.marker = this.add.graphics();
-    this.marker.lineStyle(3, 0xff0000, 1);
-    this.marker.strokeRect(0, 0, this.tilemap.tileWidth, this.tilemap.tileHeight);
+    
+    // this.tilemap.forEachTile(t => {
+    //   this.add.graphics();
+    // })
     
     const onPointerDown = {
       [TowerTypes.TOWER_BULLET]: this.putBulletTowerAt,
@@ -194,8 +196,12 @@ export default class SceneGame extends Scene {
   }
   
   putTowerAt(this: SceneGame & Scene, { x, y }: Position, type: TowerTypes) {
-    const towerX = this.marker.x + this.tilemap.tileWidth/2;
-    const towerY = this.marker.y + this.tilemap.tileHeight/2;
+    const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
+    
+    if (!tile || !this.isBuildableTile(tile)) return;
+    
+    const towerX = tile.pixelX + this.tilemap.tileWidth/2;
+    const towerY = tile.pixelY + this.tilemap.tileHeight/2;
     const key = `tower-${this.towers.children.size}`;
     
     const Tower = {
@@ -221,11 +227,30 @@ export default class SceneGame extends Scene {
   
   highlightTileAt(this: SceneGame & Scene, { x, y }: Position) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
+    const tileWidth = this.tilemap.tileWidth;
+    const tileHeight = this.tilemap.tileHeight;
 
     if (tile) {
+      // const tower = this.towers.getChildren().some(t => t.x === tile.pixelX+tileWidth/2 && t.y === tile.pixelY+tileHeight/2);
+      // console.log(this.towers.getChildren()[0].x, tile.pixelX+this.tilemap.tileWidth/2)
+      const color = this.isBuildableTile(tile) ? 0x00ff00 : 0xff0000;
+
+      this.marker.lineStyle(3, color, 1);
+      this.marker.strokeRect(0, 0, tileWidth, tileHeight);
+      // console.log('tile', tile);
       this.marker.x = tile.pixelX;
       this.marker.y = tile.pixelY;
     }
+  }
+  
+  isBuildableTile(this: SceneGame & Scene, tile: Tilemaps.Tile): boolean {
+    if (!tile || tile.index !== 2) return false;
+
+    const tileWidth = this.tilemap.tileWidth;
+    const tileHeight = this.tilemap.tileHeight;
+    const tower = this.towers.getChildren().some(t => t.x === tile.pixelX+tileWidth/2 && t.y === tile.pixelY+tileHeight/2);
+    
+    return !tower;
   }
 
   exitAddTowerMode(this: SceneGame & Scene) {

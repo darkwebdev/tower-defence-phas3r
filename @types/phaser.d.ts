@@ -65025,7 +65025,7 @@ declare namespace Phaser {
        * have at least one interesting face. Default false.
        * @param layer [description]
        */
-      findTile(callback: FindTileCallback, context?: object, tileX?: integer, tileY?: integer, width?: integer, height?: integer, filteringOptions?: object, layer?: Phaser.Tilemaps.LayerData): Phaser.Tilemaps.Tile;
+        findTile(callback: FindTileCallback, context?: object, tileX?: integer, tileY?: integer, width?: integer, height?: integer, filteringOptions?: object, layer?: Phaser.Tilemaps.LayerData): Phaser.Tilemaps.Tile;
 
       /**
        * For each tile in the given rectangular area (in tile coordinates) of the layer, run the given
