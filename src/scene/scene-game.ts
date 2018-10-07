@@ -1,8 +1,9 @@
-import { GameObjects, Physics, Scene, Tilemaps, Time, Curves, Input } from 'phaser'
+import { Curves, GameObjects, Physics, Scene, Tilemaps, Time } from 'phaser'
 import Enemy from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
+import { TowerTypes } from '../entities/tower';
 
 const FONT = '18px monospace';
 const TEXT_PADDING = { x: 20, y: 10 };
@@ -11,6 +12,7 @@ const TEXT_BG = '#000000';
 
 export const SCENE_KEY = 'scene-game';
 
+type Position = { x: number, y: number };
 export default class SceneGame extends Scene {
   text: GameObjects.Text;
   textPool: GameObjects.Text;
@@ -23,6 +25,7 @@ export default class SceneGame extends Scene {
   waveSize: number;
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
+  marker: GameObjects.Graphics;
   
   constructor() {
     console.log('Called:', 'constructor', arguments);
@@ -176,36 +179,74 @@ export default class SceneGame extends Scene {
     this.enemies.remove(<any>enemy, true, true);
   }
 
-  activateAddTowerMode(this: SceneGame & Scene) {
-    const tileWidth = this.tilemap.tileWidth;
-    const tileHeight = this.tilemap.tileHeight;
+  enterAddTowerMode(this: SceneGame & Scene, type: TowerTypes) {
+    this.marker = this.add.graphics();
+    this.marker.lineStyle(3, 0xff0000, 1);
+    this.marker.strokeRect(0, 0, this.tilemap.tileWidth, this.tilemap.tileHeight);
     
-    const marker = this.add.graphics();
-    marker.lineStyle(3, 0xff0000, 1);
-    marker.strokeRect(0, 0, tileWidth, tileHeight);
+    const onPointerDown = {
+      [TowerTypes.TOWER_BULLET]: this.putBulletTowerAt,
+      [TowerTypes.TOWER_LASER]: this.putLaserTowerAt,
+    }[type];
 
-    this.input.on('pointermove', (pointer: Input.Pointer) => {
-      const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(pointer.x, pointer.y);
-
-      if (tile) {
-        marker.x = tile.pixelX;
-        marker.y = tile.pixelY;
-      }
-    });
-
-    this.input.on('pointerdown', (pointer: Input.Pointer) => {
-      const x = marker.x + tileWidth/2;
-      const y = marker.y + tileHeight/2;
-      const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-      this.towers.add(tower);
-      console.log('New bullet tower spawned', tower.key)
-    })
+    this.input.on('pointermove', this.highlightTileAt, this);
+    this.input.on('pointerdown', onPointerDown, this);
   }
   
+  putTowerAt(this: SceneGame & Scene, { x, y }: Position, type: TowerTypes) {
+    const towerX = this.marker.x + this.tilemap.tileWidth/2;
+    const towerY = this.marker.y + this.tilemap.tileHeight/2;
+    const key = `tower-${this.towers.children.size}`;
+    
+    const Tower = {
+      [TowerTypes.TOWER_BULLET]: BulletTower,
+      [TowerTypes.TOWER_LASER]: LaserTower,
+    }[type];
+    
+    const tower = new Tower({ scene: this, x: towerX, y: towerY, key });
+    this.towers.add(tower);
+    
+    console.log('New bullet tower spawned', tower.key)
+    
+    this.events.emit(ActionTypes.TOWER_ADDED);
+  }
+
+  putBulletTowerAt(this: SceneGame & Scene, { x, y }: Position) {
+    this.putTowerAt({ x, y }, TowerTypes.TOWER_BULLET);
+  }
+
+  putLaserTowerAt(this: SceneGame & Scene, { x, y }: Position) {
+    this.putTowerAt({ x, y }, TowerTypes.TOWER_LASER);
+  }
+  
+  highlightTileAt(this: SceneGame & Scene, { x, y }: Position) {
+    const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
+
+    if (tile) {
+      this.marker.x = tile.pixelX;
+      this.marker.y = tile.pixelY;
+    }
+  }
+
+  exitAddTowerMode(this: SceneGame & Scene) {
+    console.log('Exiting add-tower mode...')
+
+    this.input.off('pointermove', this.highlightTileAt, this);
+    this.input.off('pointerdown', this.putBulletTowerAt, this);
+    this.input.off('pointerdown', this.putLaserTowerAt, this);
+    
+    this.marker.destroy();
+  }
+
   attachEventHandlers(this: SceneGame & Scene) {
-    this.events.on('add-tower', () => {
+    this.events.on(ActionTypes.ADD_TOWER, (type: TowerTypes) => {
+      console.log('Entering add-tower mode...', type)
+      this.enterAddTowerMode(type);
+    });
+
+    this.events.on(ActionTypes.TOWER_ADDED, () => {
       console.log('Entering add-tower mode...')
-      this.activateAddTowerMode();
+      this.exitAddTowerMode();
     })
   }
   

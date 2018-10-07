@@ -1,6 +1,11 @@
 import {GameObjects, Math as PMath, Scene} from 'phaser'
 import Enemy from '../enemy'
 
+export const enum TowerTypes {
+  TOWER_BULLET = 'tower-bullet',
+  TOWER_LASER = 'tower-laser',
+}
+
 type Props = {
   scene: Scene,
   x: number,
