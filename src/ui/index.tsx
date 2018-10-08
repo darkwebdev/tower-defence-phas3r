@@ -7,6 +7,7 @@ import Menu from './menu'
 import Panel from './panel'
 import './styles.less'
 import { TowerTypes } from '../entities/tower';
+import config from '../config';
 
 type Props = {
   state: State;
@@ -25,9 +26,14 @@ const UI: React.SFC<Props> = ({ state, dispatch, scene }: Props) => (
     <Panel
       hidden={!state.panelVisible}
       onMenuButtonClick={() => { dispatch(showMenu(scene)) }}
+      
       onHideButtonClick={() => { dispatch(hidePanel()) }}
       onShowButtonClick={() => { dispatch(showPanel()) }}
+      
+      bulletTowerPrice={config.towers.bullet.price}
       onBulletTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_BULLET)) }}
+      
+      laserTowerPrice={config.towers.laser.price}
       onLaserTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_LASER)) }}
     />
   </React.Fragment>
