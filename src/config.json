@@ -1,0 +1,23 @@
+{
+  "levels": [
+    {
+      "waveSize": 2
+    }
+  ],
+  "start": {
+    "money": 100,
+    "hp": 100
+  },
+  "towers": {
+    "bullet": {
+      "price": 30,
+      "dps": 10,
+      "radius": 100
+    },
+    "laser": {
+      "price": 30,
+      "dps": 5,
+      "radius": 200
+    }
+  }
+}

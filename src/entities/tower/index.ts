@@ -6,14 +6,16 @@ export const enum TowerTypes {
   TOWER_LASER = 'tower-laser',
 }
 
-type Props = {
-  scene: Scene,
-  x: number,
-  y: number,
-  height?: number,
-  width?: number,
-  radius?: number,
-  key?: string,
+export type TowerProps = {
+  scene: Scene;
+  x: number;
+  y: number;
+  height?: number;
+  width?: number;
+  radius?: number;
+  dps: number;
+  price: number;
+  key?: string;
 }
 
 type EnemyWithDistance = {
@@ -25,13 +27,18 @@ abstract class Tower extends GameObjects.Sprite {
   scene: Scene;
   key: string;
   radius: number;
+  dps: number;
+  price: number;
   
-  constructor({ scene, x, y, key = 'tower' }: Props) {
+  constructor({ scene, x, y, key = 'tower', radius, price, dps }: TowerProps) {
     super(scene, x, y, key);
     
     this.scene = scene;
     this.key = key;
-    
+    this.radius = radius;
+    this.dps = dps;
+    this.price = price;
+
     this.init();
 
     this.scene.physics.world.enable(this);

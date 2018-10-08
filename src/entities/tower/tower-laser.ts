@@ -1,35 +1,21 @@
 import { GameObjects, Scene } from 'phaser'
 import Enemy from '../enemy'
-import Tower from '.';
+import Tower, { TowerProps } from '.';
 
 const FPS = 60;
 
-type Props = {
-  scene: Scene,
-  x: number,
-  y: number,
-  key?: string,
-}
-
 export default class LaserTower extends Tower {
-  key: string;
-  radius: number;
-  dps: number;
   laser: GameObjects.Graphics;
   target: Enemy;
 
-  constructor({ scene, x, y, key = 'bullet-tower' }: Props) {
-    super({ scene, x, y, key });
-
-    this.laser = scene.add.graphics({ lineStyle: { width: 2, color: 0xFF0000 } });
-    this.key = key;
-    this.radius = 200;
-    this.dps = 10;
+  constructor(props: TowerProps) {
+    super(props);
 
     this.init();
   }
 
   init(this: LaserTower & GameObjects.Sprite) {
+    this.laser = this.scene.add.graphics({ lineStyle: { width: 2, color: 0xFF0000 } });
   }
 
   update(this: LaserTower & GameObjects.Sprite, time: number, delta: number) {

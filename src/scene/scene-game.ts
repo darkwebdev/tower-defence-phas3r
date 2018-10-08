@@ -3,20 +3,13 @@ import Enemy from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
-import { TowerTypes } from '../entities/tower';
-
-const FONT = '18px monospace';
-const TEXT_PADDING = { x: 20, y: 10 };
-const TEXT_COLOR = '#ffffff';
-const TEXT_BG = '#000000';
+import { TowerTypes, TowerProps } from '../entities/tower';
 
 export const SCENE_KEY = 'scene-game';
 
-type Position = { x: number, y: number };
 export default class SceneGame extends Scene {
-  text: GameObjects.Text;
-  textPool: GameObjects.Text;
   hp: number;
+  money: number;
   gameOver: boolean;
   home: Physics.Arcade.Image;
   enemies: GameObjects.Group;
@@ -26,6 +19,7 @@ export default class SceneGame extends Scene {
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
   marker: GameObjects.Graphics;
+  config: object;
   
   constructor() {
     console.log('Called:', 'constructor', arguments);
@@ -41,6 +35,7 @@ export default class SceneGame extends Scene {
     this.load.tilemapTiledJSON('level1', 'map/td-map.json');
     this.load.image('enemy', 'images/enemy.png');
     this.load.image('bullet', 'images/bullet.png');
+    this.load.json('config', 'config.json');
   }
 
   init(this: Scene & SceneGame) {
@@ -52,20 +47,21 @@ export default class SceneGame extends Scene {
     this.towers = this.add.group({
       runChildUpdate: true
     });
-    
-    this.waveSize = 2;
   }
   
   create(this: Scene & SceneGame) {
+    this.config = this.cache.json.get('config');
+    this.waveSize = this.config.levels[0].waveSize;
+    this.money = this.config.start.money;
+
     this.tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
     
     this.createPath();
     this.createHome();
     
-    this.createTowers();
+    // this.createTowers();
     this.createEnemies();
 
-    this.createText();
     this.attachKeyHandlers();
     this.attachEventHandlers();
   }
@@ -142,22 +138,6 @@ export default class SceneGame extends Scene {
     this.path.draw(graphics);
   }
   
-  createText(this: SceneGame & Scene) {
-    const textStyle = {
-      font: FONT,
-      fill: TEXT_BG,
-      padding: TEXT_PADDING,
-      backgroundColor: TEXT_COLOR
-    };
-    this.text = this.add
-      .text(16, 16, 'Enemy is coming!', textStyle)
-      .setScrollFactor(0);
-
-    this.textPool = this.add
-      .text(16, 64, 'Bullet pool', textStyle)
-      .setScrollFactor(0);
-  }
-
   onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
     console.log('Enemy spawned', enemy.key)
     enemy.collider = this.physics.add.overlap(
@@ -173,7 +153,6 @@ export default class SceneGame extends Scene {
     this.hp -= enemy.damage;
 
     console.log('Enemy is inside!', enemy.key, this.hp);
-    this.text.setText('Enemy inside. HP: ' + this.hp);
 
     enemy.onEnterHome();
     this.enemies.remove(<any>enemy, true, true);
@@ -181,10 +160,6 @@ export default class SceneGame extends Scene {
 
   enterAddTowerMode(this: SceneGame & Scene, type: TowerTypes) {
     this.marker = this.add.graphics();
-    
-    // this.tilemap.forEachTile(t => {
-    //   this.add.graphics();
-    // })
     
     const onPointerDown = {
       [TowerTypes.TOWER_BULLET]: this.putBulletTowerAt,
@@ -195,7 +170,7 @@ export default class SceneGame extends Scene {
     this.input.on('pointerdown', onPointerDown, this);
   }
   
-  putTowerAt(this: SceneGame & Scene, { x, y }: Position, type: TowerTypes) {
+  putTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2, type: TowerTypes) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     
     if (!tile || !this.isBuildableTile(tile)) return;
@@ -204,12 +179,19 @@ export default class SceneGame extends Scene {
     const towerY = tile.pixelY + this.tilemap.tileHeight/2;
     const key = `tower-${this.towers.children.size}`;
     
-    const Tower = {
+    const TowerClass = {
       [TowerTypes.TOWER_BULLET]: BulletTower,
       [TowerTypes.TOWER_LASER]: LaserTower,
     }[type];
+
+    const configProp = {
+      [TowerTypes.TOWER_BULLET]: 'bullet',
+      [TowerTypes.TOWER_LASER]: 'laser',
+    }[type];
     
-    const tower = new Tower({ scene: this, x: towerX, y: towerY, key });
+    const { dps, price, radius }: TowerProps = this.config.towers[configProp];
+    
+    const tower = new TowerClass({ scene: this, x: towerX, y: towerY, key, dps, price, radius });
     this.towers.add(tower);
     
     console.log('New bullet tower spawned', tower.key)
@@ -217,27 +199,24 @@ export default class SceneGame extends Scene {
     this.events.emit(ActionTypes.TOWER_ADDED);
   }
 
-  putBulletTowerAt(this: SceneGame & Scene, { x, y }: Position) {
+  putBulletTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
     this.putTowerAt({ x, y }, TowerTypes.TOWER_BULLET);
   }
 
-  putLaserTowerAt(this: SceneGame & Scene, { x, y }: Position) {
+  putLaserTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
     this.putTowerAt({ x, y }, TowerTypes.TOWER_LASER);
   }
   
-  highlightTileAt(this: SceneGame & Scene, { x, y }: Position) {
+  highlightTileAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     const tileWidth = this.tilemap.tileWidth;
     const tileHeight = this.tilemap.tileHeight;
 
     if (tile) {
-      // const tower = this.towers.getChildren().some(t => t.x === tile.pixelX+tileWidth/2 && t.y === tile.pixelY+tileHeight/2);
-      // console.log(this.towers.getChildren()[0].x, tile.pixelX+this.tilemap.tileWidth/2)
       const color = this.isBuildableTile(tile) ? 0x00ff00 : 0xff0000;
 
       this.marker.lineStyle(3, color, 1);
       this.marker.strokeRect(0, 0, tileWidth, tileHeight);
-      // console.log('tile', tile);
       this.marker.x = tile.pixelX;
       this.marker.y = tile.pixelY;
     }

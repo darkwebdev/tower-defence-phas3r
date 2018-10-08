@@ -11,6 +11,7 @@ module.exports = merge(common, {
     new CopyWebpackPlugin([
       { from: 'map', to: 'map'},
       { from: 'images', to: 'images'},
+      'src/config.json'
     ], {})
   ],
   
