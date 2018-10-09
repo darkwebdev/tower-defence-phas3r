@@ -2,12 +2,13 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Scenes } from 'phaser'
 import { State } from '../store'
-import { addTower, hidePanel, restartGame, resumeGame, showMenu, showPanel } from '../actions'
-import Menu from './menu'
-import Panel from './panel'
-import './styles.less'
+import { addTower, hideControl, restartGame, resumeGame, showMenu, showControl } from '../actions'
 import { TowerTypes } from '../entities/tower';
 import config from '../config';
+import Menu from './menu'
+import Control from './control'
+import Status from './status'
+import './styles.less'
 
 type Props = {
   state: State;
@@ -23,12 +24,17 @@ const UI: React.SFC<Props> = ({ state, dispatch, scene }: Props) => (
       onRestart={() => { dispatch(restartGame(scene)) }}
     />
     
-    <Panel
+    <Status
+      money={state.money}
+      hp={state.hp}
+    />
+    
+    <Control
       hidden={!state.panelVisible}
       onMenuButtonClick={() => { dispatch(showMenu(scene)) }}
       
-      onHideButtonClick={() => { dispatch(hidePanel()) }}
-      onShowButtonClick={() => { dispatch(showPanel()) }}
+      onHideButtonClick={() => { dispatch(hideControl()) }}
+      onShowButtonClick={() => { dispatch(showControl()) }}
       
       bulletTowerPrice={config.towers.bullet.price}
       onBulletTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_BULLET)) }}

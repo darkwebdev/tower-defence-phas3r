@@ -17,7 +17,7 @@
     "laser": {
       "price": 40,
       "dps": 5,
-      "radius": 200
+      "radius": 150
     }
   }
 }

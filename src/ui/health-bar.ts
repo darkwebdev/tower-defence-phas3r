@@ -1,4 +1,4 @@
-import { GameObjects } from 'phaser';
+import { GameObjects, Math as PhaserMath } from 'phaser';
 
 const BORDER_THICKNESS = 1;
 const BORDER_COLOR = 0x000000;
@@ -31,16 +31,18 @@ export default class HealthBar extends GameObjects.GameObject {
     scene.add.existing(this.bar);
   }
 
-  setTo(this: HealthBar & GameObjects.GameObject, value: number, x: number, y: number) {
+  setTo(this: HealthBar & GameObjects.GameObject, { x, y }: PhaserMath.Vector2, value: number) {
     this.x = x;
     this.y = y;
-    this.value = value < 0 ? 0 : value;
-
-    this.draw();
-
-    return (this.value === 0);
+    
+    if (value) {
+      this.value = value < 0 ? 0 : value;
+      this.draw();
+    }
   }
 
+  update(this: HealthBar & GameObjects.GameObject) {}
+  
   draw(this: HealthBar & GameObjects.GameObject) {
     this.bar.clear();
 

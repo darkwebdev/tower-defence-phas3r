@@ -44,12 +44,13 @@ export default class Enemy extends GameObjects.Sprite {
     this.pathT += this.speed * delta;
     this.scene.path.getPoint(this.pathT, this.pathVec);
     this.setPosition(this.pathVec.x, this.pathVec.y);
+    this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
     // console.log('ENEMY UPDATE', this.pathT, this.pathVec, this.x, this.y)
   }
   
   onHit(this: Enemy & GameObjects.GameObject, damage: number) {
     this.hp -= damage;
-    this.healthBar.setTo(this.hp, this.x - this.height, this.y + this.width);
+    this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
     console.log('hp', this.hp, this.key)
   }
   

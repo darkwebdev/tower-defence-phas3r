@@ -35,6 +35,15 @@ const game = new Game({
       scene.events.on(ActionTypes.SHOW_MENU, () => {
         store.dispatch(showMenu(scene.scene));
       });
+      
+      [
+        ActionTypes.HP_UPDATED,
+        ActionTypes.MONEY_UPDATED,
+      ].forEach(type => {
+        scene.events.on(type, payload => {
+          store.dispatch({ type, payload });
+        })
+      })
     }
   }
 });

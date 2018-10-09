@@ -1,6 +1,7 @@
 import { action } from 'typesafe-actions'
 import { Scenes } from 'phaser'
 import { TowerTypes } from './entities/tower';
+import { Action, AnyAction } from 'redux';
 
 export const enum ActionTypes {
   SHOW_MENU = 'show-menu',
@@ -10,6 +11,8 @@ export const enum ActionTypes {
   RESTART = 'restart',
   ADD_TOWER = 'add-tower',
   TOWER_ADDED = 'tower-added',
+  MONEY_UPDATED = 'money-updated',
+  HP_UPDATED = 'hp-updated',
 }
 
 export const showMenu = (scene: Scenes.ScenePlugin) => {
@@ -30,9 +33,9 @@ export const restartGame = (scene: Scenes.ScenePlugin) => {
   return action(ActionTypes.RESTART);
 };
 
-export const hidePanel = () => action(ActionTypes.HIDE_PANEL);
+export const hideControl = () => action(ActionTypes.HIDE_PANEL);
 
-export const showPanel = () => action(ActionTypes.SHOW_PANEL);
+export const showControl = () => action(ActionTypes.SHOW_PANEL);
 
 export const addTower = (scene: Scenes.ScenePlugin, type: TowerTypes) => {
   console.log('Entering Add-Tower mode...', type)
@@ -41,3 +44,5 @@ export const addTower = (scene: Scenes.ScenePlugin, type: TowerTypes) => {
 
   return action(ActionTypes.ADD_TOWER);
 };
+
+export const defaultAction = (event: AnyAction) => action(event.type, event.payload);

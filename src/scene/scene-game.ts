@@ -4,13 +4,14 @@ import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
 import { TowerTypes, TowerProps } from '../entities/tower';
+import { Config } from '../config';
 
 export const SCENE_KEY = 'scene-game';
 
 export default class SceneGame extends Scene {
-  hp: number;
-  money: number;
-  gameOver: boolean;
+  hp: number = 0;
+  money: number = 0;
+  gameOver: boolean = false;
   home: Physics.Arcade.Image;
   enemies: GameObjects.Group;
   towers: GameObjects.Group;
@@ -19,10 +20,9 @@ export default class SceneGame extends Scene {
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
   marker: GameObjects.Graphics;
-  config: object;
+  config: Config;
   
   constructor() {
-    console.log('Called:', 'constructor', arguments);
     super({
       key: SCENE_KEY,
       active: false,
@@ -52,7 +52,11 @@ export default class SceneGame extends Scene {
   create(this: Scene & SceneGame) {
     this.config = this.cache.json.get('config');
     this.waveSize = this.config.levels[0].waveSize;
-    this.money = this.config.start.money;
+    this.changeMoney(this.config.start.money);
+    this.changeHp(this.config.start.hp);
+
+    console.log('$', this.money)
+    console.log('hp', this.hp)
 
     this.tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
     
@@ -68,16 +72,16 @@ export default class SceneGame extends Scene {
 
   update(time: number, delta: number) {
     if (this.gameOver) return;
+    if (this.hp <= 0) {
+      this.gameOver = true;
+      //todo: emit & pause
+    }
 
     this.enemies.getChildren().forEach(e => {
       if (e.hp <= 0) {
         this.enemies.remove(<any>e, true, true); // possible race condition?
       }
     });
-    
-    if (this.hp <= 0) {
-      this.gameOver = true;
-    }
   }
   
   createHome(this: SceneGame & Scene) {
@@ -86,25 +90,23 @@ export default class SceneGame extends Scene {
     this.home = this.physics.add
       .image(homeTemplate.x, homeTemplate.y, 'enemy')
       .setSize(homeTemplate.width,homeTemplate.height);
-
-    this.hp = 100;
   }
   
-  createTowers(this: SceneGame & Scene) {
-    const bulletTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Bullet tower', {});
-    bulletTowers.forEach(({ x, y }) => {
-      const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-      this.towers.add(tower);
-      console.log('New bullet tower spawned', tower.key)
-    });
-
-    const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
-    laserTowers.forEach(({ x, y }) => {
-      const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-      this.towers.add(tower);
-      console.log('New laser tower spawned', tower.key)
-    });
-  }
+  // createTowers(this: SceneGame & Scene) {
+  //   const bulletTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Bullet tower', {});
+  //   bulletTowers.forEach(({ x, y }) => {
+  //     const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+  //     this.towers.add(tower);
+  //     console.log('New bullet tower spawned', tower.key)
+  //   });
+  //
+  //   const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
+  //   laserTowers.forEach(({ x, y }) => {
+  //     const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+  //     this.towers.add(tower);
+  //     console.log('New laser tower spawned', tower.key)
+  //   });
+  // }
 
   createEnemies(this: SceneGame & Scene) {
     const enemies = this.tilemap.createFromObjects('enemies', 'enemy', {});
@@ -150,7 +152,7 @@ export default class SceneGame extends Scene {
   }
   
   onEnemyEnter(enemy: Enemy): void {
-    this.hp -= enemy.damage;
+    this.changeHp(-enemy.damage);
 
     console.log('Enemy is inside!', enemy.key, this.hp);
 
@@ -193,8 +195,9 @@ export default class SceneGame extends Scene {
     
     const tower = new TowerClass({ scene: this, x: towerX, y: towerY, key, dps, price, radius });
     this.towers.add(tower);
-    
-    console.log('New bullet tower spawned', tower.key)
+    this.changeMoney(-tower.price);
+
+    console.log('New tower spawned', tower.key, this.hp)
     
     this.events.emit(ActionTypes.TOWER_ADDED);
   }
@@ -240,6 +243,15 @@ export default class SceneGame extends Scene {
     this.input.off('pointerdown', this.putLaserTowerAt, this);
     
     this.marker.destroy();
+  }
+  
+  changeHp(this: SceneGame & Scene, delta: number) {
+    this.hp += delta;
+    this.events.emit(ActionTypes.HP_UPDATED, this.hp);
+  }
+  changeMoney(this: SceneGame & Scene, delta: number) {
+    this.money += delta;
+    this.events.emit(ActionTypes.MONEY_UPDATED, this.money);
   }
 
   attachEventHandlers(this: SceneGame & Scene) {

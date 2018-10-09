@@ -53,7 +53,7 @@ abstract class Tower extends GameObjects.Sprite {
     const closestEnemyWithDistance: EnemyWithDistance | undefined = this.closestEnemy(enemies);
     
     if (closestEnemyWithDistance && closestEnemyWithDistance.distance < this.radius) {
-      // console.log('shoot', closestEnemyWithDistance.enemy, closestEnemyWithDistance.distance)
+      // console.log('shoot', closestEnemyWithDistance.enemy.key, closestEnemyWithDistance.distance, this.radius)
       this.shoot(closestEnemyWithDistance.enemy);
     }
   }

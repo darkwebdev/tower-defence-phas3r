@@ -19,9 +19,10 @@ export default class LaserTower extends Tower {
   }
 
   update(this: LaserTower & GameObjects.Sprite, time: number, delta: number) {
-    super.update(time, delta);
-
+    this.target = undefined;
     this.laser.clear();
+    
+    super.update(time, delta);
 
     if (this.target && this.target.active) {
       console.log('LASER on', this.target.key)
