@@ -1,5 +1,5 @@
 import { Curves, GameObjects, Physics, Scene, Tilemaps, Time, Math } from 'phaser'
-import Enemy from '../entities/enemy'
+import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
@@ -77,8 +77,9 @@ export default class SceneGame extends Scene {
       //todo: emit & pause
     }
 
-    this.enemies.getChildren().forEach(e => {
+    this.enemies.getChildren().forEach((e: Enemy) => {
       if (e.hp <= 0) {
+        this.changeMoney(e.money);
         this.enemies.remove(<any>e, true, true); // possible race condition?
       }
     });
@@ -121,7 +122,7 @@ export default class SceneGame extends Scene {
   }
   
   spawnEnemy({ x, y, width, height }: GameObjects.Sprite): void {
-    const enemy = new Enemy({ scene: this, x, y, key: `enemy-${this.enemies.children.size}` });
+    const enemy = new Enemy(<EnemyProps>{ ...this.config.enemies.default, scene: this, x, y, width, height, key: `enemy-${this.enemies.children.size}` });
     this.enemies.add(enemy);
     console.log('New enemy spawned', enemy.key)
   }
@@ -192,6 +193,11 @@ export default class SceneGame extends Scene {
     }[type];
     
     const { dps, price, radius }: TowerProps = this.config.towers[configProp];
+    
+    if (this.money < price) {
+      console.log('NOT ENOUGH $ to build a tower!')
+      return;
+    }
     
     const tower = new TowerClass({ scene: this, x: towerX, y: towerY, key, dps, price, radius });
     this.towers.add(tower);

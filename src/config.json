@@ -8,15 +8,22 @@
     "money": 100,
     "hp": 100
   },
+  "enemies": {
+    "default": {
+      "hp": 40,
+      "damage": 10,
+      "money": 20
+    }
+  },
   "towers": {
     "bullet": {
       "price": 30,
-      "dps": 10,
+      "dps": 20,
       "radius": 100
     },
     "laser": {
       "price": 40,
-      "dps": 5,
+      "dps": 10,
       "radius": 150
     }
   }

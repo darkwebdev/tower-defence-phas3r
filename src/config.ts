@@ -1,4 +1,5 @@
 import { TowerProps } from './entities/tower';
+import { EnemyProps } from './entities/enemy';
 
 export type Config = {
   levels: any[];
@@ -6,9 +7,11 @@ export type Config = {
     money: number;
     hp: number;
   }
+  enemies: {
+    [key: string]: Partial<EnemyProps>
+  }
   towers: {
-    bullet: Partial<TowerProps>;
-    laser: Partial<TowerProps>;
+    [key: string]: Partial<TowerProps>;
   }
 }
 

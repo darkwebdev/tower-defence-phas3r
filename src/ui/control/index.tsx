@@ -12,10 +12,15 @@ declare global {
 type Props = {
   hidden: boolean;
   onMenuButtonClick: () => void;
+  
+  isBulletTowerDisabled: boolean;
   bulletTowerPrice: number;
   onBulletTowerButtonClick: () => void;
+
+  isLaserTowerDisabled: boolean;
   laserTowerPrice: number;
   onLaserTowerButtonClick: () => void;
+  
   onHideButtonClick: () => void;
   onShowButtonClick: () => void;
 }
@@ -28,8 +33,8 @@ export default class Control extends React.Component<Props> {
     return (
       <ui-control hidden={p.hidden}>
         <button hidden={p.hidden} onClick={p.onMenuButtonClick}>Menu</button>
-        <button hidden={p.hidden} onClick={p.onBulletTowerButtonClick}>Bullet Tower ${p.bulletTowerPrice}</button>
-        <button hidden={p.hidden} onClick={p.onLaserTowerButtonClick}>Laser Tower ${p.laserTowerPrice}</button>
+        <button hidden={p.hidden} disabled={p.isBulletTowerDisabled} onClick={p.onBulletTowerButtonClick}>Bullet Tower ${p.bulletTowerPrice}</button>
+        <button hidden={p.hidden} disabled={p.isLaserTowerDisabled} onClick={p.onLaserTowerButtonClick}>Laser Tower ${p.laserTowerPrice}</button>
         <button hidden={p.hidden} onClick={p.onHideButtonClick}>Hide</button>
         <button hidden={!p.hidden} onClick={p.onShowButtonClick}>Show</button>
       </ui-control>

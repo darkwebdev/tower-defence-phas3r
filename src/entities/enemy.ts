@@ -1,15 +1,16 @@
 import { Scene, Physics, GameObjects, Math } from 'phaser'
 import HealthBar from '../ui/health-bar'
 
-type Props = {
-  scene: Scene,
-  x: number,
-  y: number,
-  height?: number,
-  width?: number,
-  hp?: number,
-  damage?: number,
-  key?: string
+export type EnemyProps = {
+  scene: Scene;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  hp: number;
+  damage: number;
+  money: number;
+  key: string;
 }
 
 const SPEED: number = 1/10000;
@@ -20,12 +21,13 @@ export default class Enemy extends GameObjects.Sprite {
   hp: number;
   healthBar: HealthBar;
   damage: number;
+  money: number;
   speed: number;
   key: string;
   pathT: number;
   pathVec: Math.Vector2;
   
-  constructor({ scene, x, y, height = 30, width = 30, hp = 100, damage = 10, key = 'generic enemy' }: Props) {
+  constructor({ scene, x, y, height, width, hp, damage, money, key }: EnemyProps) {
     super(scene, x, y, key);
     
     this.scene = scene;
@@ -34,6 +36,7 @@ export default class Enemy extends GameObjects.Sprite {
     this.damage = damage;
     this.speed = SPEED;
     this.key = key;
+    this.money = money;
     this.pathT = 0;
     this.pathVec = new Math.Vector2();
 
