@@ -64,8 +64,6 @@ export default class SceneGame extends Scene {
     this.createPath();
     this.createHome();
     
-    // this.buildingFrames = this.textures.get('buildings').getFrameNames();
-    
     this.createTowers();
     this.createEnemies();
 
@@ -98,9 +96,9 @@ export default class SceneGame extends Scene {
   
   createTowers(this: SceneGame & Scene) {
     const bulletTowers: any[] = this.tilemap.filterObjects('towers', (t => t.name === 'Bullet tower'));
-    const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.bullet;
 
     bulletTowers.forEach(t => {
+      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.bullet;
       const x = t.x + this.tilemap.tileWidth/2;
       const y = t.y - this.tilemap.tileHeight/2;
       const tower = new BulletTower({ scene: this, x, y, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name: t.name });
@@ -108,12 +106,15 @@ export default class SceneGame extends Scene {
       console.log('New bullet tower spawned')
     });
 
-    // const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
-    // laserTowers.forEach(({ x, y }) => {
-    //   const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-    //   this.towers.add(tower);
-    //   console.log('New laser tower spawned', tower.key)
-    // });
+    const laserTowers: any[] = this.tilemap.filterObjects('towers', (t => t.name === 'Laser tower'));
+    laserTowers.forEach(t => {
+      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.laser;
+      const x = t.x + this.tilemap.tileWidth/2;
+      const y = t.y - this.tilemap.tileHeight/2;
+      const tower = new LaserTower({ scene: this, x, y, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name: t.name });
+      this.towers.add(tower);
+      console.log('New laser tower spawned')
+    });
   }
 
   createEnemies(this: SceneGame & Scene) {

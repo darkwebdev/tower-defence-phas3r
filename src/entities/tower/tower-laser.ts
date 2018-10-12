@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from 'phaser'
+import { GameObjects } from 'phaser'
 import Enemy from '../enemy'
 import Tower, { TowerProps } from '.';
 
@@ -25,8 +25,8 @@ export default class LaserTower extends Tower {
     super.update(time, delta);
 
     if (this.target && this.target.active) {
-      console.log('LASER on', this.target.key)
-      this.laser.lineBetween(this.x, this.y, this.target.x, this.target.y);
+      // console.log('LASER on', this.x, this.y, this.target.x, this.target.y)
+      this.laser.lineBetween(this.gun.x, this.gun.y, this.target.x, this.target.y);
       this.target.onHit(this.dps / FPS);
     }
   }

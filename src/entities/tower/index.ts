@@ -50,14 +50,16 @@ abstract class Tower extends GameObjects.GameObject{
 
     this.base = this.scene.add.sprite(x, y, baseTexture, baseFrame);
     this.gun = this.scene.add.sprite(x, y, gunTexture, gunFrame);
-
-    console.log('base', this.base)
-    this.init();
-
+    this.gun.setDepth(1);
+    
     this.scene.physics.world.enable(this.base);
+
+    this.init();
   }
   
-  init() {}
+  init() {
+    // can be implemented by children
+  }
 
   update(time: number, delta: number) {
     const enemies: GameObjects.GameObject[] = this.scene.enemies.getChildren().filter(e => e.active);

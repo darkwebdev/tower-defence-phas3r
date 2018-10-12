@@ -66,5 +66,6 @@ export default class Bullet extends GameObjects.Rectangle {
     if (this.collider.active) this.collider.destroy();
     this.scene.physics.world.disable(this);
     this.setVisible(false);
+    // this.clear();
   }
 }

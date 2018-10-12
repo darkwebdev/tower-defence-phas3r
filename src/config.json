@@ -29,7 +29,12 @@
     "laser": {
       "price": 40,
       "dps": 10,
-      "radius": 150
+      "radius": 150,
+      "baseTexture": "buildings",
+      "baseFrame": "platform_small_b.png",
+      "gunTexture": "buildings",
+      "gunFrame": "gun_small_red.png",
+      "angleOffset": 90
     }
   }
 }
