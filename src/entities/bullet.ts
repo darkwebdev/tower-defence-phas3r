@@ -1,47 +1,43 @@
 import { GameObjects, Scene } from 'phaser'
 import Enemy from './enemy';
 
-type Props = {
-  scene: Scene,
-  x: number,
-  y: number,
-  speed?: number,
-  damage?: number,
-  target: GameObjects.GameObject,
-  key?: string,
-}
+const WIDTH = 4;
+const HEIGHT = 4;
+const COLOR = 0xff0000;
+const ALPHA = 1;
+const SPEED = 300;
+const DAMAGE = 5;
 
-export default class Bullet extends GameObjects.Image {
+export default class Bullet extends GameObjects.Rectangle {
   scene: Scene;
   x: number;
   y: number;
-  speed: number;
-  damage;
-  number;
+  width: number;
+  height: number;
+  speed: number = SPEED;
+  damage: number = DAMAGE;
   target: GameObjects.GameObject;
   onHit: (bullet: Bullet, enemyHit: Enemy) => void;
   onLost: () => void;
-  key: string;
 
-  constructor(scene, x, y, key = 'bullet') {
-    super(scene, x, y, key);
+  constructor(scene, x, y) {
+    super(scene, x, y, WIDTH, HEIGHT, COLOR, ALPHA);
 
-    // console.log('NEW BULLET', x, y, key)
+    console.log('NEW BULLET', x, y)
 
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.speed = 100;
-    this.damage = 5;
-    this.key = key;
-
-    // graphics.fillStyle(0xff0000, 1);
-    // graphics.fillCircle(this.x, this.y, 5);
+    
+    this.init();
+  }
+  
+  init(this: Bullet & GameObjects.Rectangle) {
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
   }
 
-  setTarget(this: Bullet & GameObjects.Image, target: GameObjects.GameObject): void {
+  setTarget(this: Bullet & GameObjects.Rectangle, target: GameObjects.GameObject): void {
     this.target = target;
 
     this.collider = this.scene.physics.add.overlap(
@@ -52,13 +48,10 @@ export default class Bullet extends GameObjects.Image {
       this
     );
 
-    // this.setActive(true);
-    this.setPosition(this.x, this.y);
-    // console.log('MOVE BULLET', this.x, this.y, this.target.key, this.speed)
     this.scene.physics.moveToObject(this, this.target, this.speed);
   }
 
-  update(this: Bullet & GameObjects.Image, time: number, delta: number): void {
+  update(this: Bullet & GameObjects.Rectangle, time: number, delta: number): void {
     if (
       this.y < 0 || this.x < 0 ||
       this.y > this.scene.sys.canvas.height || this.x > this.scene.sys.canvas.width
@@ -68,10 +61,10 @@ export default class Bullet extends GameObjects.Image {
     }
   }
 
-  destroy(this: Bullet & GameObjects.Image): void {
+  destroy(this: Bullet & GameObjects.Rectangle): void {
     // console.log('/BULLET', this.key)
     if (this.collider.active) this.collider.destroy();
     this.scene.physics.world.disable(this);
-    // this.scene.remove(this);
+    this.setVisible(false);
   }
 }

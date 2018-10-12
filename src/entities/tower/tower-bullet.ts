@@ -13,13 +13,10 @@ export default class BulletTower extends Tower {
     super(props);
 
     this.init();
-    // this.base = this.scene.add.sprite(scene, x, y, baseTexture, baseFrame);
-    // this.gun = this.scene.add.sprite(scene, x, y, gunTexture, gunFrame);
   }
 
   init() {
     this.lastFired = 0;
-    // this.scene.add.existing(this.base);
 
     this.bullets = this.scene.add.group({
       classType: Bullet,
@@ -28,7 +25,7 @@ export default class BulletTower extends Tower {
       runChildUpdate: true,
       createCallback: (bullet: Bullet) => {
         bullet.onHit = (bulletHit: Bullet, enemyHit: Enemy) => {
-          console.log('HIT', bulletHit.key, enemyHit.key)
+          console.log('HIT', bulletHit, enemyHit.key)
           enemyHit.onHit(bulletHit.damage);
           this.bullets.remove(<any>bulletHit, true, true);
         };
@@ -55,7 +52,7 @@ export default class BulletTower extends Tower {
     const delay = (60 * 5) / this.dps;
     
     if (this.lastFired > delay) {
-      const bullet = this.bullets.create(this.base.x, this.base.y, 'bullet-' + this.bullets.children.size);
+      const bullet = this.bullets.create(this.gun.x, this.gun.y);
       
       if (bullet) {
         this.lastFired = 0;

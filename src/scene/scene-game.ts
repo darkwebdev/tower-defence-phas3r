@@ -3,7 +3,7 @@ import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
-import Tower, { TowerProps, TowerTypes } from '../entities/tower';
+import { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
 
 export const SCENE_KEY = 'scene-game';
