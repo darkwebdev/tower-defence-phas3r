@@ -10,36 +10,39 @@ export type EnemyProps = {
   hp: number;
   damage: number;
   money: number;
-  key: string;
+  texture: string;
+  frame: string;
+  name: string;
 }
 
 const SPEED: number = 1/10000;
 
 export default class Enemy extends GameObjects.Sprite {
   scene: Scene;
+  name: string;
   collider: Physics.Arcade.Collider;
   hp: number;
   healthBar: HealthBar;
   damage: number;
   money: number;
   speed: number;
-  key: string;
   pathT: number;
   pathVec: Math.Vector2;
   
-  constructor({ scene, x, y, height, width, hp, damage, money, key }: EnemyProps) {
-    super(scene, x, y, key);
+  constructor({ scene, x, y, height, width, hp, damage, money, texture, frame, name }: EnemyProps) {
+    super(scene, x, y, texture, frame);
     
     this.scene = scene;
+    this.name = name;
     this.hp = hp;
     this.healthBar = new HealthBar(scene, hp, x-height, y+width);
     this.damage = damage;
     this.speed = SPEED;
-    this.key = key;
     this.money = money;
     this.pathT = 0;
     this.pathVec = new Math.Vector2();
 
+    this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
   }
 
@@ -54,18 +57,19 @@ export default class Enemy extends GameObjects.Sprite {
   onHit(this: Enemy & GameObjects.GameObject, damage: number) {
     this.hp -= damage;
     this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
-    console.log('hp', this.hp, this.key)
+    console.log('hp', this.hp, this.name)
   }
   
   onEnterHome() {
-    console.log('I am home', this.key)
+    console.log('I am home', this.name)
   }
 
   destroy(this: Enemy & GameObjects.GameObject) {
-    console.log('/ENEMY', this.key)
+    console.log('/ENEMY', this.name)
     this.collider.destroy();
     this.scene.physics.world.disable(this);
     this.setActive(false);
     this.healthBar.destroy();
+    this.setFrame('truck1_destroyed.png')
   }
 }

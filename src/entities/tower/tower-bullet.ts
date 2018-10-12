@@ -25,7 +25,7 @@ export default class BulletTower extends Tower {
       runChildUpdate: true,
       createCallback: (bullet: Bullet) => {
         bullet.onHit = (bulletHit: Bullet, enemyHit: Enemy) => {
-          console.log('HIT', bulletHit, enemyHit.key)
+          console.log('HIT', bulletHit, enemyHit.texture)
           enemyHit.onHit(bulletHit.damage);
           this.bullets.remove(<any>bulletHit, true, true);
         };

@@ -34,6 +34,7 @@ export default class SceneGame extends Scene {
     this.load.image('tiles', 'map/td.png');
     this.load.tilemapTiledJSON('level1', 'map/td-map.json');
     this.load.atlas('buildings', 'images/buildings.png', 'images/buildings.json');
+    this.load.atlas('vehicles', 'images/ground_units.png', 'images/ground_units.json');
     this.load.image('enemy', 'images/enemy.png');
     this.load.image('bullet', 'images/bullet.png');
     this.load.json('config', 'config.json');
@@ -129,10 +130,10 @@ export default class SceneGame extends Scene {
     });
   }
   
-  spawnEnemy({ x, y, width, height }: GameObjects.Sprite): void {
-    const enemy = new Enemy(<EnemyProps>{ ...this.config.enemies.default, scene: this, x, y, width, height, key: `enemy-${this.enemies.children.size}` });
+  spawnEnemy({ x, y }: GameObjects.Sprite): void {
+    const enemy = new Enemy(<EnemyProps>{ ...this.config.enemies.default, scene: this, x, y, name: `enemy-${this.enemies.children.size}` });
     this.enemies.add(enemy);
-    console.log('New enemy spawned', enemy.key)
+    console.log('New enemy spawned', enemy.name)
   }
   
   createPath(this: SceneGame & Scene) {
@@ -150,7 +151,7 @@ export default class SceneGame extends Scene {
   }
   
   onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
-    console.log('Enemy spawned', enemy.key)
+    console.log('Enemy spawned', enemy.texture)
     enemy.collider = this.physics.add.overlap(
       enemy,
       this.home,
@@ -163,7 +164,7 @@ export default class SceneGame extends Scene {
   onEnemyEnter(enemy: Enemy): void {
     this.changeHp(-enemy.damage);
 
-    console.log('Enemy is inside!', enemy.key, this.hp);
+    console.log('Enemy is inside!', enemy.texture, this.hp);
 
     enemy.onEnterHome();
     this.enemies.remove(<any>enemy, true, true);

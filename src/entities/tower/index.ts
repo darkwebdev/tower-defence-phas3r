@@ -58,7 +58,7 @@ abstract class Tower extends GameObjects.GameObject{
   }
   
   init() {
-    // can be implemented by children
+    // will be overloaded by children
   }
 
   update(time: number, delta: number) {

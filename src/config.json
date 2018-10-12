@@ -12,7 +12,9 @@
     "default": {
       "hp": 40,
       "damage": 10,
-      "money": 20
+      "money": 20,
+      "texture": "vehicles",
+      "frame": "truck1_body.png"
     }
   },
   "towers": {
