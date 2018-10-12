@@ -12,10 +12,15 @@ export type TowerProps = {
   y: number;
   height?: number;
   width?: number;
-  radius?: number;
+  radius: number;
   dps: number;
   price: number;
-  key?: string;
+  baseTexture: string;
+  gunTexture: string;
+  baseFrame?: string;
+  gunFrame?: string;
+  angleOffset: number;
+  name: string;
 }
 
 type EnemyWithDistance = {
@@ -23,51 +28,67 @@ type EnemyWithDistance = {
   distance: number
 }
 
-abstract class Tower extends GameObjects.Sprite {
+abstract class Tower extends GameObjects.GameObject{
   scene: Scene;
-  key: string;
+  base: GameObjects.Sprite;
+  gun: GameObjects.Sprite;
   radius: number;
   dps: number;
   price: number;
+  name: string;
+  angleOffset: number = 0;
   
-  constructor({ scene, x, y, key = 'tower', radius, price, dps }: TowerProps) {
-    super(scene, x, y, key);
+  constructor({ scene, x, y, baseTexture, gunTexture, baseFrame, gunFrame, radius, price, dps, name, angleOffset }: TowerProps) {
+    super(scene, name);
     
     this.scene = scene;
-    this.key = key;
     this.radius = radius;
     this.dps = dps;
     this.price = price;
+    this.name = name;
+    this.angleOffset = angleOffset;
 
+    this.base = this.scene.add.sprite(x, y, baseTexture, baseFrame);
+    this.gun = this.scene.add.sprite(x, y, gunTexture, gunFrame);
+
+    console.log('base', this.base)
     this.init();
 
-    this.scene.physics.world.enable(this);
+    this.scene.physics.world.enable(this.base);
   }
   
-  init(this: Tower & GameObjects.Sprite) {
-  }
+  init() {}
 
-  update(this: Tower & GameObjects.Sprite, time: number, delta: number) {
+  update(time: number, delta: number) {
     const enemies: GameObjects.GameObject[] = this.scene.enemies.getChildren().filter(e => e.active);
 
     const closestEnemyWithDistance: EnemyWithDistance | undefined = this.closestEnemy(enemies);
     
-    if (closestEnemyWithDistance && closestEnemyWithDistance.distance < this.radius) {
-      // console.log('shoot', closestEnemyWithDistance.enemy.key, closestEnemyWithDistance.distance, this.radius)
-      this.shoot(closestEnemyWithDistance.enemy);
+    if (closestEnemyWithDistance) {
+      this.turnTo(closestEnemyWithDistance.enemy);
+      
+      if (closestEnemyWithDistance.distance < this.radius) {
+        // console.log('shoot', closestEnemyWithDistance.enemy.key, closestEnemyWithDistance.distance, this.radius)
+        this.shoot(closestEnemyWithDistance.enemy);
+      }
     }
   }
-
-  shoot(this: Tower & GameObjects.Sprite, enemy: Enemy) {
+  
+  turnTo(enemy: Enemy) {
+    const angle = PMath.RadToDeg(PMath.Angle.BetweenPoints(this.gun, enemy)) - this.angleOffset;
+    this.gun.setAngle(angle);
+    // console.log('turnTo', this.angle, this.gun.angle, this.gun.x, this.gun.y, enemy.x, enemy.y)
   }
 
-  closestEnemy(this: Tower & GameObjects.Sprite, enemies: Enemy[]) {
+  shoot(enemy: Enemy) {}
+
+  closestEnemy(enemies: Enemy[]) {
     return enemies.reduce((
       closestEnemyWithDistance: EnemyWithDistance | undefined,
       currentEnemy: Enemy & GameObjects.Sprite) => {
         const currentEnemyWithDistance = {
           enemy: currentEnemy,
-          distance: PMath.Distance.Between(this.x, this.y, currentEnemy.x, currentEnemy.y)
+          distance: PMath.Distance.Between(this.base.x, this.base.y, currentEnemy.x, currentEnemy.y)
         };
   
         if (!closestEnemyWithDistance) return currentEnemyWithDistance;

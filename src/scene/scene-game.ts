@@ -1,9 +1,9 @@
-import { Curves, GameObjects, Physics, Scene, Tilemaps, Time, Math } from 'phaser'
+import { Curves, GameObjects, Math, Physics, Scene, Tilemaps, Time } from 'phaser'
 import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
-import { TowerTypes, TowerProps } from '../entities/tower';
+import Tower, { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
 
 export const SCENE_KEY = 'scene-game';
@@ -33,6 +33,7 @@ export default class SceneGame extends Scene {
   preload(this: Scene & SceneGame) {
     this.load.image('tiles', 'map/td.png');
     this.load.tilemapTiledJSON('level1', 'map/td-map.json');
+    this.load.atlas('buildings', 'images/buildings.png', 'images/buildings.json');
     this.load.image('enemy', 'images/enemy.png');
     this.load.image('bullet', 'images/bullet.png');
     this.load.json('config', 'config.json');
@@ -63,7 +64,9 @@ export default class SceneGame extends Scene {
     this.createPath();
     this.createHome();
     
-    // this.createTowers();
+    // this.buildingFrames = this.textures.get('buildings').getFrameNames();
+    
+    this.createTowers();
     this.createEnemies();
 
     this.attachKeyHandlers();
@@ -93,21 +96,25 @@ export default class SceneGame extends Scene {
       .setSize(homeTemplate.width,homeTemplate.height);
   }
   
-  // createTowers(this: SceneGame & Scene) {
-  //   const bulletTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Bullet tower', {});
-  //   bulletTowers.forEach(({ x, y }) => {
-  //     const tower = new BulletTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-  //     this.towers.add(tower);
-  //     console.log('New bullet tower spawned', tower.key)
-  //   });
-  //
-  //   const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
-  //   laserTowers.forEach(({ x, y }) => {
-  //     const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
-  //     this.towers.add(tower);
-  //     console.log('New laser tower spawned', tower.key)
-  //   });
-  // }
+  createTowers(this: SceneGame & Scene) {
+    const bulletTowers: any[] = this.tilemap.filterObjects('towers', (t => t.name === 'Bullet tower'));
+    const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.bullet;
+
+    bulletTowers.forEach(t => {
+      const x = t.x + this.tilemap.tileWidth/2;
+      const y = t.y - this.tilemap.tileHeight/2;
+      const tower = new BulletTower({ scene: this, x, y, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name: t.name });
+      this.towers.add(tower);
+      console.log('New bullet tower spawned')
+    });
+
+    // const laserTowers: GameObjects.Sprite[] = this.tilemap.createFromObjects('towers', 'Laser tower', {});
+    // laserTowers.forEach(({ x, y }) => {
+    //   const tower = new LaserTower({ scene: this, x, y, key: `tower-${this.towers.children.size}` });
+    //   this.towers.add(tower);
+    //   console.log('New laser tower spawned', tower.key)
+    // });
+  }
 
   createEnemies(this: SceneGame & Scene) {
     const enemies = this.tilemap.createFromObjects('enemies', 'enemy', {});
@@ -180,7 +187,7 @@ export default class SceneGame extends Scene {
     
     const towerX = tile.pixelX + this.tilemap.tileWidth/2;
     const towerY = tile.pixelY + this.tilemap.tileHeight/2;
-    const key = `tower-${this.towers.children.size}`;
+    const name = `tower-${this.towers.children.size}`;
     
     const TowerClass = {
       [TowerTypes.TOWER_BULLET]: BulletTower,
@@ -192,18 +199,18 @@ export default class SceneGame extends Scene {
       [TowerTypes.TOWER_LASER]: 'laser',
     }[type];
     
-    const { dps, price, radius }: TowerProps = this.config.towers[configProp];
+    const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers[configProp];
     
     if (this.money < price) {
       console.log('NOT ENOUGH $ to build a tower!')
       return;
     }
     
-    const tower = new TowerClass({ scene: this, x: towerX, y: towerY, key, dps, price, radius });
+    const tower = new TowerClass({ scene: this, x: towerX, y: towerY, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name });
     this.towers.add(tower);
     this.changeMoney(-tower.price);
 
-    console.log('New tower spawned', tower.key, this.hp)
+    console.log('New tower spawned', tower, this.hp)
     
     this.events.emit(ActionTypes.TOWER_ADDED);
   }

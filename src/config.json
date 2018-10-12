@@ -19,7 +19,12 @@
     "bullet": {
       "price": 30,
       "dps": 20,
-      "radius": 100
+      "radius": 100,
+      "baseTexture": "buildings",
+      "baseFrame": "platform_small.png",
+      "gunTexture": "buildings",
+      "gunFrame": "gun_small_brown.png",
+      "angleOffset": 90 
     },
     "laser": {
       "price": 40,

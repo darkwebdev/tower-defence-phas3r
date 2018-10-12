@@ -32,7 +32,7 @@ export default class LaserTower extends Tower {
   }
 
   shoot(this: LaserTower & GameObjects.Sprite, enemy: Enemy & GameObjects.GameObject) {
-    console.log('Engaging the enemy', this.key, enemy.key)
+    console.log('Engaging the enemy', this.texture, enemy.key)
     this.target = enemy;
   }
 }

@@ -1,4 +1,4 @@
-import {GameObjects, Scene} from 'phaser'
+import { GameObjects, Scene } from 'phaser'
 import Enemy from './enemy';
 
 type Props = {
@@ -16,17 +16,18 @@ export default class Bullet extends GameObjects.Image {
   x: number;
   y: number;
   speed: number;
-  damage; number;
+  damage;
+  number;
   target: GameObjects.GameObject;
   onHit: (bullet: Bullet, enemyHit: Enemy) => void;
   onLost: () => void;
   key: string;
-  
+
   constructor(scene, x, y, key = 'bullet') {
     super(scene, x, y, key);
-    
+
     // console.log('NEW BULLET', x, y, key)
-    
+
     this.scene = scene;
     this.x = x;
     this.y = y;
@@ -39,10 +40,10 @@ export default class Bullet extends GameObjects.Image {
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
   }
-  
+
   setTarget(this: Bullet & GameObjects.Image, target: GameObjects.GameObject): void {
     this.target = target;
-    
+
     this.collider = this.scene.physics.add.overlap(
       this,
       this.target,
@@ -50,10 +51,10 @@ export default class Bullet extends GameObjects.Image {
       undefined,
       this
     );
-    
+
     // this.setActive(true);
     this.setPosition(this.x, this.y);
-    console.log('MOVE BULLET', this.x, this.y, this.target.key, this.speed)
+    // console.log('MOVE BULLET', this.x, this.y, this.target.key, this.speed)
     this.scene.physics.moveToObject(this, this.target, this.speed);
   }
 
@@ -66,9 +67,9 @@ export default class Bullet extends GameObjects.Image {
       this.onLost();
     }
   }
-  
+
   destroy(this: Bullet & GameObjects.Image): void {
-    console.log('/BULLET', this.key, this.collider)
+    // console.log('/BULLET', this.key)
     if (this.collider.active) this.collider.destroy();
     this.scene.physics.world.disable(this);
     // this.scene.remove(this);
