@@ -151,7 +151,7 @@ export default class SceneGame extends Scene {
   }
   
   onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
-    console.log('Enemy spawned', enemy.texture)
+    console.log('Enemy spawned', enemy.name)
     enemy.collider = this.physics.add.overlap(
       enemy,
       this.home,
@@ -164,7 +164,7 @@ export default class SceneGame extends Scene {
   onEnemyEnter(enemy: Enemy): void {
     this.changeHp(-enemy.damage);
 
-    console.log('Enemy is inside!', enemy.texture, this.hp);
+    console.log('Enemy is inside!', enemy.name, this.hp);
 
     enemy.onEnterHome();
     this.enemies.remove(<any>enemy, true, true);
@@ -243,9 +243,9 @@ export default class SceneGame extends Scene {
   isBuildableTile(this: SceneGame & Scene, tile: Tilemaps.Tile): boolean {
     if (!tile || tile.index !== 2) return false;
 
-    const tileWidth = this.tilemap.tileWidth;
-    const tileHeight = this.tilemap.tileHeight;
-    const tower = this.towers.getChildren().some(t => t.x === tile.pixelX+tileWidth/2 && t.y === tile.pixelY+tileHeight/2);
+    const tileCenterX = tile.pixelX+this.tilemap.tileWidth/2;
+    const tileCenterY = tile.pixelY+this.tilemap.tileHeight/2;
+    const tower = this.towers.getChildren().some(tower => tower.base.x === tileCenterX && tower.base.y === tileCenterY);
     
     return !tower;
   }
