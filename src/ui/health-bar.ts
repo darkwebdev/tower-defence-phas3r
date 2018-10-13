@@ -19,20 +19,19 @@ export default class HealthBar extends GameObjects.GameObject {
   constructor(scene, maxValue, x, y) {
     super(scene, 'health-bar');
     
+    console.log('HEALTH', x, y)
+    
     this.bar = new GameObjects.Graphics(scene);
 
-    this.x = x;
-    this.y = y;
     this.maxValue = maxValue;
-    this.value = maxValue;
-
+    this.setTo({ x, y }, maxValue);
     this.draw();
 
     scene.add.existing(this.bar);
   }
 
   setTo(this: HealthBar & GameObjects.GameObject, { x, y }: PhaserMath.Vector2, value: number) {
-    this.x = x;
+    this.x = x - this.width/2;
     this.y = y;
     
     if (value) {

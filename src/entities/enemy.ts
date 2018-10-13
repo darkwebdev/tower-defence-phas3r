@@ -45,10 +45,12 @@ export default class Enemy extends GameObjects.GameObject {
     this.pathT = 0;
     this.pathVec = new PMath.Vector2();
     this.angleOffset = angleOffset;
-    this.healthBar = new HealthBar(scene, hp, x-height, y+width);
     this.sprite = new GameObjects.Sprite(scene, x, y, texture, frame);
+    this.healthBar = new HealthBar(scene, hp, x, y + this.sprite.height/2);
     this.sprite.on('onHit', damage => this.onHit(damage));
 
+    console.log('ENEMY', this)
+    
     this.scene.add.existing(this.sprite);
     this.scene.physics.world.enable(this.sprite);
   }
@@ -63,7 +65,7 @@ export default class Enemy extends GameObjects.GameObject {
   }
 
   updateHealthBar() {
-    this.healthBar.setTo({ x: this.sprite.x - this.sprite.height, y: this.sprite.y + this.sprite.width }, this.hp);
+    this.healthBar.setTo({ x: this.sprite.x, y: this.sprite.y + this.sprite.height/2 }, this.hp);
   }
   
   onHit(damage: number) {
