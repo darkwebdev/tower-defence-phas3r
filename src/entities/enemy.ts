@@ -1,4 +1,4 @@
-import { Scene, Physics, GameObjects, Math } from 'phaser'
+import { Scene, Physics, GameObjects, Math as PMath } from 'phaser'
 import HealthBar from '../ui/health-bar'
 
 export type EnemyProps = {
@@ -12,6 +12,7 @@ export type EnemyProps = {
   money: number;
   texture: string;
   frame: string;
+  angleOffset: number;
   name: string;
 }
 
@@ -27,9 +28,10 @@ export default class Enemy extends GameObjects.Sprite {
   money: number;
   speed: number;
   pathT: number;
-  pathVec: Math.Vector2;
+  pathVec: PMath.Vector2;
+  angleOffset: number;
   
-  constructor({ scene, x, y, height, width, hp, damage, money, texture, frame, name }: EnemyProps) {
+  constructor({ scene, x, y, height, width, hp, damage, money, texture, frame, angleOffset, name }: EnemyProps) {
     super(scene, x, y, texture, frame);
     
     this.scene = scene;
@@ -40,7 +42,8 @@ export default class Enemy extends GameObjects.Sprite {
     this.speed = SPEED;
     this.money = money;
     this.pathT = 0;
-    this.pathVec = new Math.Vector2();
+    this.pathVec = new PMath.Vector2();
+    this.angleOffset = angleOffset;
 
     this.scene.add.existing(this);
     this.scene.physics.world.enable(this);
@@ -49,9 +52,10 @@ export default class Enemy extends GameObjects.Sprite {
   update(this: Enemy & GameObjects.GameObject, time: number, delta: number): void {
     this.pathT += this.speed * delta;
     this.scene.path.getPoint(this.pathT, this.pathVec);
+    const angle = PMath.RadToDeg(PMath.Angle.Between(this.x, this.y, this.pathVec.x, this.pathVec.y)) - this.angleOffset;
+    this.setAngle(angle);
     this.setPosition(this.pathVec.x, this.pathVec.y);
     this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
-    // console.log('ENEMY UPDATE', this.pathT, this.pathVec, this.x, this.y)
   }
   
   onHit(this: Enemy & GameObjects.GameObject, damage: number) {

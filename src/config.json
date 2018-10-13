@@ -14,7 +14,8 @@
       "damage": 10,
       "money": 20,
       "texture": "vehicles",
-      "frame": "truck1_body.png"
+      "frame": "truck1_body.png",
+      "angleOffset": 270
     }
   },
   "towers": {
