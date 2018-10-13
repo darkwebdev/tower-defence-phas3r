@@ -77,7 +77,7 @@ abstract class Tower extends GameObjects.GameObject{
   }
   
   turnTo(enemy: Enemy) {
-    const angle = PMath.RadToDeg(PMath.Angle.BetweenPoints(this.gun, enemy)) - this.angleOffset;
+    const angle = PMath.RadToDeg(PMath.Angle.BetweenPoints(this.gun, enemy.sprite)) - this.angleOffset;
     this.gun.setAngle(angle);
     // console.log('turnTo', this.angle, this.gun.angle, this.gun.x, this.gun.y, enemy.x, enemy.y)
   }
@@ -87,10 +87,10 @@ abstract class Tower extends GameObjects.GameObject{
   closestEnemy(enemies: Enemy[]) {
     return enemies.reduce((
       closestEnemyWithDistance: EnemyWithDistance | undefined,
-      currentEnemy: Enemy & GameObjects.Sprite) => {
+      currentEnemy: Enemy) => {
         const currentEnemyWithDistance = {
           enemy: currentEnemy,
-          distance: PMath.Distance.Between(this.base.x, this.base.y, currentEnemy.x, currentEnemy.y)
+          distance: PMath.Distance.Between(this.base.x, this.base.y, currentEnemy.sprite.x, currentEnemy.sprite.y)
         };
   
         if (!closestEnemyWithDistance) return currentEnemyWithDistance;

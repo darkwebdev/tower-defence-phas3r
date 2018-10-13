@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import { Scenes } from 'phaser'
 import { State } from '../store'
-import { addTower, hideControl, restartGame, resumeGame, showMenu, showControl } from '../actions'
+import { addTower, hideControl, restartGame, resumeGame, showMenu, showControl, startNewWave } from '../actions'
 import { TowerTypes } from '../entities/tower';
 import config from '../config';
 import Menu from './menu'
@@ -43,6 +43,8 @@ const UI: React.SFC<Props> = ({ state, dispatch, scene }: Props) => (
       isLaserTowerDisabled={state.money < config.towers.laser.price}
       laserTowerPrice={config.towers.laser.price}
       onLaserTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_LASER)) }}
+      
+      onNewWaveClick={()=> { dispatch(startNewWave(scene)) }}
     />
   </React.Fragment>
 );

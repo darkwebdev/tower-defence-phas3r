@@ -52,7 +52,7 @@ const game = new Game({
 
 function renderUI() {
   const state: State = store.getState();
-  console.log('RENDER UI', state, scene)
+  console.log('RENDER UI', state)
   
   render(
     UI({ state, dispatch: store.dispatch, scene: scene.scene }),

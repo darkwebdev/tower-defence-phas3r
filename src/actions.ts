@@ -13,6 +13,7 @@ export const enum ActionTypes {
   TOWER_ADDED = 'tower-added',
   MONEY_UPDATED = 'money-updated',
   HP_UPDATED = 'hp-updated',
+  NEW_WAVE = 'new-wave',
 }
 
 export const showMenu = (scene: Scenes.ScenePlugin) => {
@@ -43,6 +44,14 @@ export const addTower = (scene: Scenes.ScenePlugin, type: TowerTypes) => {
   scene.scene.events.emit('add-tower', type);
 
   return action(ActionTypes.ADD_TOWER);
+};
+
+export const startNewWave = (scene: Scenes.ScenePlugin) => {
+  console.log('Starting new wave...')
+
+  scene.scene.events.emit('new-wave');
+  
+  return action(ActionTypes.NEW_WAVE);
 };
 
 export const defaultAction = (event: AnyAction) => action(event.type, event.payload);

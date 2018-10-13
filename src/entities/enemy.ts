@@ -18,62 +18,70 @@ export type EnemyProps = {
 
 const SPEED: number = 1/10000;
 
-export default class Enemy extends GameObjects.Sprite {
+export default class Enemy extends GameObjects.GameObject {
   scene: Scene;
   name: string;
-  collider: Physics.Arcade.Collider;
+  position: PMath.Vector2;
   hp: number;
-  healthBar: HealthBar;
   damage: number;
   money: number;
   speed: number;
   pathT: number;
   pathVec: PMath.Vector2;
   angleOffset: number;
+  healthBar: HealthBar;
+  collider: Physics.Arcade.Collider;
+  sprite: GameObjects.Sprite;
   
   constructor({ scene, x, y, height, width, hp, damage, money, texture, frame, angleOffset, name }: EnemyProps) {
-    super(scene, x, y, texture, frame);
+    super(scene);
     
     this.scene = scene;
     this.name = name;
     this.hp = hp;
-    this.healthBar = new HealthBar(scene, hp, x-height, y+width);
     this.damage = damage;
     this.speed = SPEED;
     this.money = money;
     this.pathT = 0;
     this.pathVec = new PMath.Vector2();
     this.angleOffset = angleOffset;
+    this.healthBar = new HealthBar(scene, hp, x-height, y+width);
+    this.sprite = new GameObjects.Sprite(scene, x, y, texture, frame);
+    this.sprite.on('onHit', damage => this.onHit(damage));
 
-    this.scene.add.existing(this);
-    this.scene.physics.world.enable(this);
+    this.scene.add.existing(this.sprite);
+    this.scene.physics.world.enable(this.sprite);
   }
 
-  update(this: Enemy & GameObjects.GameObject, time: number, delta: number): void {
+  update(time: number, delta: number): void {
     this.pathT += this.speed * delta;
     this.scene.path.getPoint(this.pathT, this.pathVec);
-    const angle = PMath.RadToDeg(PMath.Angle.Between(this.x, this.y, this.pathVec.x, this.pathVec.y)) - this.angleOffset;
-    this.setAngle(angle);
-    this.setPosition(this.pathVec.x, this.pathVec.y);
-    this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
+    const angle = PMath.RadToDeg(PMath.Angle.Between(this.sprite.x, this.sprite.y, this.pathVec.x, this.pathVec.y)) - this.angleOffset;
+    this.sprite.setAngle(angle);
+    this.sprite.setPosition(this.pathVec.x, this.pathVec.y);
+    this.updateHealthBar();
+  }
+
+  updateHealthBar() {
+    this.healthBar.setTo({ x: this.sprite.x - this.sprite.height, y: this.sprite.y + this.sprite.width }, this.hp);
   }
   
-  onHit(this: Enemy & GameObjects.GameObject, damage: number) {
+  onHit(damage: number) {
     this.hp -= damage;
-    this.healthBar.setTo({ x: this.x - this.height, y: this.y + this.width }, this.hp);
-    console.log('hp', this.hp, this.name)
+    this.updateHealthBar();
+    // console.log('hp', this.hp, this.name)
   }
   
   onEnterHome() {
     console.log('I am home', this.name)
   }
 
-  destroy(this: Enemy & GameObjects.GameObject) {
+  destroy() {
     console.log('/ENEMY', this.name)
     this.collider.destroy();
-    this.scene.physics.world.disable(this);
-    this.setActive(false);
+    this.scene.physics.world.disable(this.sprite);
+    this.sprite.setActive(false);
     this.healthBar.destroy();
-    this.setFrame('truck1_destroyed.png')
+    this.sprite.setFrame('truck1_destroyed.png');
   }
 }

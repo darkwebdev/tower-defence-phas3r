@@ -1,4 +1,4 @@
-import { Curves, GameObjects, Math, Physics, Scene, Tilemaps, Time } from 'phaser'
+import { Curves, GameObjects, Math as PMath, Physics, Scene, Tilemaps, Time } from 'phaser'
 import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
@@ -7,6 +7,7 @@ import { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
 
 export const SCENE_KEY = 'scene-game';
+const ENEMIES_INTERVAL_MS = 2000;
 
 export default class SceneGame extends Scene {
   hp: number = 0;
@@ -15,8 +16,8 @@ export default class SceneGame extends Scene {
   home: Physics.Arcade.Image;
   enemies: GameObjects.Group;
   towers: GameObjects.Group;
-  enemyRespawn: Time.TimerEvent;
   waveSize: number;
+  enemySpawnVector2: PMath.Vector2;
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
   marker: GameObjects.Graphics;
@@ -56,9 +57,6 @@ export default class SceneGame extends Scene {
     this.waveSize = this.config.levels[0].waveSize;
     this.changeMoney(this.config.start.money);
     this.changeHp(this.config.start.hp);
-
-    console.log('$', this.money)
-    console.log('hp', this.hp)
 
     this.tilemap = this.make.tilemap({ key: 'level1', tileHeight: 20, tileWidth: 20 });
     
@@ -120,20 +118,25 @@ export default class SceneGame extends Scene {
 
   createEnemies(this: SceneGame & Scene) {
     const enemies = this.tilemap.createFromObjects('enemies', 'enemy', {});
-    const enemyTemplate: GameObjects.Sprite = enemies[0];
+    this.enemySpawnVector2 = enemies[0];
 
-    this.enemyRespawn = this.time.addEvent({
-      delay: 5000,
-      callback: () => this.spawnEnemy(enemyTemplate),
-      callbackScope: this,
-      repeat: this.waveSize-1
-    });
+    this.spawnWave();
   }
   
-  spawnEnemy({ x, y }: GameObjects.Sprite): void {
+  spawnWave(this: SceneGame & Scene) {
+    this.time.addEvent({
+      delay: ENEMIES_INTERVAL_MS,
+      callback: () => this.spawnEnemy(this.enemySpawnVector2),
+      callbackScope: this,
+      repeat: this.waveSize-1
+    });  
+  }
+  
+  spawnEnemy({ x, y }: PMath.Vector2) {
     const enemy = new Enemy(<EnemyProps>{ ...this.config.enemies.default, scene: this, x, y, name: `enemy-${this.enemies.children.size}` });
     this.enemies.add(enemy);
-    console.log('New enemy spawned', enemy.name)
+    this.waveSize *= 2;
+    console.log('New enemy spawned', enemy.name, this.waveSize)
   }
   
   createPath(this: SceneGame & Scene) {
@@ -150,7 +153,7 @@ export default class SceneGame extends Scene {
     this.path.draw(graphics);
   }
   
-  onEnemySpawn(this: Scene & SceneGame, enemy: Enemy): void {
+  onEnemySpawn(this: Scene & SceneGame, enemy: Enemy) {
     console.log('Enemy spawned', enemy.name)
     enemy.collider = this.physics.add.overlap(
       enemy,
@@ -161,7 +164,7 @@ export default class SceneGame extends Scene {
     );
   }
   
-  onEnemyEnter(enemy: Enemy): void {
+  onEnemyEnter(enemy: Enemy) {
     this.changeHp(-enemy.damage);
 
     console.log('Enemy is inside!', enemy.name, this.hp);
@@ -182,7 +185,7 @@ export default class SceneGame extends Scene {
     this.input.on('pointerdown', onPointerDown, this);
   }
   
-  putTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2, type: TowerTypes) {
+  putTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2, type: TowerTypes) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     
     if (!tile || !this.isBuildableTile(tile)) return;
@@ -217,15 +220,15 @@ export default class SceneGame extends Scene {
     this.events.emit(ActionTypes.TOWER_ADDED);
   }
 
-  putBulletTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
+  putBulletTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
     this.putTowerAt({ x, y }, TowerTypes.TOWER_BULLET);
   }
 
-  putLaserTowerAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
+  putLaserTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
     this.putTowerAt({ x, y }, TowerTypes.TOWER_LASER);
   }
   
-  highlightTileAt(this: SceneGame & Scene, { x, y }: Math.Vector2) {
+  highlightTileAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     const tileWidth = this.tilemap.tileWidth;
     const tileHeight = this.tilemap.tileHeight;
@@ -278,7 +281,12 @@ export default class SceneGame extends Scene {
     this.events.on(ActionTypes.TOWER_ADDED, () => {
       console.log('Entering add-tower mode...')
       this.exitAddTowerMode();
-    })
+    });
+
+    this.events.on(ActionTypes.NEW_WAVE, () => {
+      console.log('New wave coming...')
+      this.spawnWave();
+    });
   }
   
   attachKeyHandlers(this: SceneGame & Scene) {

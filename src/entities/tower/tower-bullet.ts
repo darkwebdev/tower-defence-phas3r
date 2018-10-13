@@ -24,14 +24,14 @@ export default class BulletTower extends Tower {
       maxSize: BULLET_POOL_SIZE,
       runChildUpdate: true,
       createCallback: (bullet: Bullet) => {
-        bullet.onHit = (bulletHit: Bullet, enemyHit: Enemy) => {
-          console.log('HIT', bulletHit, enemyHit.texture)
-          enemyHit.onHit(bulletHit.damage);
+        bullet.onHit = (bulletHit: Bullet, sprite: GameObjects.Sprite) => {
+          // console.log('HIT', bulletHit, sprite.name)
+          sprite.emit('onHit', bulletHit.damage);
           this.bullets.remove(<any>bulletHit, true, true);
         };
         bullet.onLost = () => {
           this.bullets.remove(<any>bullet, true, true);
-          console.log(`Bullets pool: ${this.bullets.getLength()} / ${this.bullets.maxSize}`);
+          // console.log(`Bullets pool: ${this.bullets.getLength()} / ${this.bullets.maxSize}`);
         };
       }
     });
@@ -45,7 +45,7 @@ export default class BulletTower extends Tower {
   }
 
   shoot(enemy: Enemy) {
-    console.log('Engaging the enemy', this, enemy)
+    // console.log('Engaging the enemy', this, enemy)
 
     // DPS = bps * bullet.damage = (FPS / BULLET_DELAY) * bullet.damage
     //delay = fps / (dps/b.dmg) = (fps*b.dmg) / dps
@@ -58,7 +58,7 @@ export default class BulletTower extends Tower {
         this.lastFired = 0;
         bullet.setTarget(enemy);
       }
-      console.log(`Bullets pool: ${this.bullets.getLength()} / ${this.bullets.maxSize}`)
+      // console.log(`Bullets pool: ${this.bullets.getLength()} / ${this.bullets.maxSize}`)
     }
   }
 }

@@ -16,14 +16,14 @@ export default class Bullet extends GameObjects.Rectangle {
   height: number;
   speed: number = SPEED;
   damage: number = DAMAGE;
-  target: GameObjects.GameObject;
-  onHit: (bullet: Bullet, enemyHit: Enemy) => void;
+  target: Enemy;
+  onHit: (bullet: Bullet, sprite: GameObjects.Sprite) => void;
   onLost: () => void;
 
   constructor(scene, x, y) {
     super(scene, x, y, WIDTH, HEIGHT, COLOR, ALPHA);
 
-    console.log('NEW BULLET', x, y)
+    // console.log('NEW BULLET', x, y)
 
     this.scene = scene;
     this.x = x;
@@ -37,18 +37,18 @@ export default class Bullet extends GameObjects.Rectangle {
     this.scene.physics.world.enable(this);
   }
 
-  setTarget(this: Bullet & GameObjects.Rectangle, target: GameObjects.GameObject): void {
+  setTarget(this: Bullet & GameObjects.Rectangle, target: Enemy): void {
     this.target = target;
 
     this.collider = this.scene.physics.add.overlap(
       this,
-      this.target,
-      (bullet, enemyHit) => this.onHit(bullet, enemyHit),
+      this.target.sprite,
+      (bullet, sprite) => this.onHit(bullet, sprite),
       undefined,
       this
     );
 
-    this.scene.physics.moveToObject(this, this.target, this.speed);
+    this.scene.physics.moveToObject(this, this.target.sprite, this.speed);
   }
 
   update(this: Bullet & GameObjects.Rectangle, time: number, delta: number): void {
