@@ -21,6 +21,7 @@ export default class SceneGame extends Scene {
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
   marker: GameObjects.Graphics;
+  grid: GameObjects.Graphics;
   config: Config;
   
   constructor() {
@@ -141,7 +142,7 @@ export default class SceneGame extends Scene {
   
   createPath(this: SceneGame & Scene) {
     const tileset: Tilemaps.Tileset = this.tilemap.addTilesetImage('td', 'tiles');
-    this.tilemap.createStaticLayer("terrain", tileset, 0, 0);
+    this.tilemap.createStaticLayer('terrain', tileset, 0, 0);
 
     this.path = this.add.path(96, -32);
     this.path.lineTo(96, 164);
@@ -174,18 +175,16 @@ export default class SceneGame extends Scene {
   }
 
   enterAddTowerMode(this: SceneGame & Scene, type: TowerTypes) {
-    this.marker = this.add.graphics();
+    this.grid = this.add.graphics();
+    drawGrid(this.grid, this.tilemap);
     
-    const onPointerDown = {
-      [TowerTypes.TOWER_BULLET]: this.putBulletTowerAt,
-      [TowerTypes.TOWER_LASER]: this.putLaserTowerAt,
-    }[type];
+    this.marker = this.add.graphics();
 
-    this.input.on('pointermove', this.highlightTileAt, this);
-    this.input.on('pointerdown', onPointerDown, this);
+    this.input.on('pointermove', (point: PMath.Vector2) => this.highlightTileAt(point));
+    this.input.on('pointerdown', (point: PMath.Vector2) => this.placeTowerAt(point, type));
   }
   
-  putTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2, type: TowerTypes) {
+  placeTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2, type: TowerTypes) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     
     if (!tile || !this.isBuildableTile(tile)) return;
@@ -215,19 +214,12 @@ export default class SceneGame extends Scene {
     this.towers.add(tower);
     this.changeMoney(-tower.price);
 
+    this.grid.destroy();
     console.log('New tower spawned', tower, this.hp)
     
     this.events.emit(ActionTypes.TOWER_ADDED);
   }
 
-  putBulletTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
-    this.putTowerAt({ x, y }, TowerTypes.TOWER_BULLET);
-  }
-
-  putLaserTowerAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
-    this.putTowerAt({ x, y }, TowerTypes.TOWER_LASER);
-  }
-  
   highlightTileAt(this: SceneGame & Scene, { x, y }: PMath.Vector2) {
     const tile: Tilemaps.Tile = this.tilemap.getTileAtWorldXY(x, y);
     const tileWidth = this.tilemap.tileWidth;
@@ -257,8 +249,8 @@ export default class SceneGame extends Scene {
     console.log('Exiting add-tower mode...')
 
     this.input.off('pointermove', this.highlightTileAt, this);
-    this.input.off('pointerdown', this.putBulletTowerAt, this);
-    this.input.off('pointerdown', this.putLaserTowerAt, this);
+    this.input.off('pointerdown', this.placeBulletTowerAt, this);
+    this.input.off('pointerdown', this.placeLaserTowerAt, this);
     
     this.marker.destroy();
   }
@@ -301,3 +293,18 @@ export default class SceneGame extends Scene {
   }
 }
 
+function drawGrid(graphics: GameObjects.Graphics, { width, height, tileWidth, tileHeight }: Tilemaps.Tilemap) {
+  graphics.lineStyle(1, 0xeeeeee, 0.5);
+  
+  for (let i = 0; i < height; i++) {
+    graphics.moveTo(0, i * tileHeight);
+    graphics.lineTo(width*tileWidth, i * tileHeight);
+  }
+  
+  for(let j = 0; j < width; j++) {
+    graphics.moveTo(j * tileWidth, 0);
+    graphics.lineTo(j * tileHeight, height*tileHeight);
+  }
+  
+  graphics.strokePath();
+}
