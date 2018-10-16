@@ -1,9 +1,9 @@
-import { Curves, GameObjects, Math as PMath, Physics, Scene, Tilemaps, Time } from 'phaser'
+import { Curves, GameObjects, Math as PMath, Physics, Scene, Tilemaps } from 'phaser'
 import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../actions';
-import { TowerProps, TowerTypes } from '../entities/tower';
+import Tower, { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
 
 export const SCENE_KEY = 'scene-game';
@@ -20,7 +20,8 @@ export default class SceneGame extends Scene {
   enemySpawnVector2: PMath.Vector2;
   path: Curves.Path;
   tilemap: Tilemaps.Tilemap;
-  marker: GameObjects.Graphics;
+  coverageArea: GameObjects.Arc;
+  ghostTower: GameObjects.Sprite;
   grid: GameObjects.Graphics;
   config: Config;
   
@@ -98,7 +99,7 @@ export default class SceneGame extends Scene {
     const bulletTowers: any[] = this.tilemap.filterObjects('towers', (t => t.name === 'Bullet tower'));
 
     bulletTowers.forEach(t => {
-      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.bullet;
+      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers[TowerTypes.TOWER_BULLET];
       const x = t.x + this.tilemap.tileWidth/2;
       const y = t.y - this.tilemap.tileHeight/2;
       const tower = new BulletTower({ scene: this, x, y, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name: t.name });
@@ -108,7 +109,7 @@ export default class SceneGame extends Scene {
 
     const laserTowers: any[] = this.tilemap.filterObjects('towers', (t => t.name === 'Laser tower'));
     laserTowers.forEach(t => {
-      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers.laser;
+      const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers[TowerTypes.TOWER_LASER];
       const x = t.x + this.tilemap.tileWidth/2;
       const y = t.y - this.tilemap.tileHeight/2;
       const tower = new LaserTower({ scene: this, x, y, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset, dps, price, radius, name: t.name });
@@ -178,7 +179,18 @@ export default class SceneGame extends Scene {
     this.grid = this.add.graphics();
     drawGrid(this.grid, this.tilemap);
     
-    this.marker = this.add.graphics();
+    showCoverageAreas(this.towers);
+    
+    const { radius, baseTexture, baseFrame }: TowerProps = this.config.towers[type];
+
+    this.ghostTower = this.add
+      .sprite(0, 0, baseTexture, baseFrame)
+      .setAlpha(0.5);
+    
+    this.coverageArea = this.add
+      .circle(0, 0, radius, 0x00ff00, 0.2)
+      .setStrokeStyle(1, 0x00ff00)
+      .setVisible(true);
 
     this.input.on('pointermove', (point: PMath.Vector2) => this.highlightTileAt(point));
     this.input.on('pointerdown', (point: PMath.Vector2) => this.placeTowerAt(point, type));
@@ -197,13 +209,8 @@ export default class SceneGame extends Scene {
       [TowerTypes.TOWER_BULLET]: BulletTower,
       [TowerTypes.TOWER_LASER]: LaserTower,
     }[type];
-
-    const configProp = {
-      [TowerTypes.TOWER_BULLET]: 'bullet',
-      [TowerTypes.TOWER_LASER]: 'laser',
-    }[type];
     
-    const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers[configProp];
+    const { dps, price, radius, baseTexture, baseFrame, gunTexture, gunFrame, angleOffset }: TowerProps = this.config.towers[type];
     
     if (this.money < price) {
       console.log('NOT ENOUGH $ to build a tower!')
@@ -215,6 +222,8 @@ export default class SceneGame extends Scene {
     this.changeMoney(-tower.price);
 
     this.grid.destroy();
+    hideCoverageAreas(this.towers);
+    this.coverageArea.setVisible(false);
     console.log('New tower spawned', tower, this.hp)
     
     this.events.emit(ActionTypes.TOWER_ADDED);
@@ -228,10 +237,15 @@ export default class SceneGame extends Scene {
     if (tile) {
       const color = this.isBuildableTile(tile) ? 0x00ff00 : 0xff0000;
 
-      this.marker.lineStyle(3, color, 1);
-      this.marker.strokeRect(0, 0, tileWidth, tileHeight);
-      this.marker.x = tile.pixelX;
-      this.marker.y = tile.pixelY;
+      const tileCenterX = tile.pixelX + tileWidth/2;
+      const tileCenterY = tile.pixelY + tileHeight/2;
+      
+      this.ghostTower.setPosition(tileCenterX, tileCenterY);
+      
+      this.coverageArea
+        .setPosition(tileCenterX, tileCenterY)
+        .setFillStyle(color, 0.2)
+        .setStrokeStyle(1, color);
     }
   }
   
@@ -252,7 +266,7 @@ export default class SceneGame extends Scene {
     this.input.off('pointerdown', this.placeBulletTowerAt, this);
     this.input.off('pointerdown', this.placeLaserTowerAt, this);
     
-    this.marker.destroy();
+    this.ghostTower.destroy();
   }
   
   changeHp(this: SceneGame & Scene, delta: number) {
@@ -307,4 +321,16 @@ function drawGrid(graphics: GameObjects.Graphics, { width, height, tileWidth, ti
   }
   
   graphics.strokePath();
+}
+
+function showCoverageAreas(towers: GameObjects.Group) {
+  towers.getChildren().forEach((t: Tower) => {
+    t.coverageArea.setVisible(true);
+  });
+}
+
+function hideCoverageAreas(towers: GameObjects.Group) {
+  towers.getChildren().forEach((t: Tower) => {
+    t.coverageArea.setVisible(false);
+  });
 }

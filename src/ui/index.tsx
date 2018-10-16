@@ -16,6 +16,7 @@ type Props = {
   scene: Scenes.ScenePlugin;
 }
 
+const towers = config.towers;
 const UI: React.SFC<Props> = ({ state, dispatch, scene }: Props) => (
   <React.Fragment>
     <Menu
@@ -36,12 +37,12 @@ const UI: React.SFC<Props> = ({ state, dispatch, scene }: Props) => (
       onHideButtonClick={() => { dispatch(hideControl()) }}
       onShowButtonClick={() => { dispatch(showControl()) }}
 
-      isBulletTowerDisabled={state.money < config.towers.bullet.price}
-      bulletTowerPrice={config.towers.bullet.price}
+      isBulletTowerDisabled={state.money < towers[TowerTypes.TOWER_BULLET].price}
+      bulletTowerPrice={towers[TowerTypes.TOWER_BULLET].price}
       onBulletTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_BULLET)) }}
 
-      isLaserTowerDisabled={state.money < config.towers.laser.price}
-      laserTowerPrice={config.towers.laser.price}
+      isLaserTowerDisabled={state.money < towers[TowerTypes.TOWER_LASER].price}
+      laserTowerPrice={towers[TowerTypes.TOWER_LASER].price}
       onLaserTowerButtonClick={() => { dispatch(addTower(scene, TowerTypes.TOWER_LASER)) }}
       
       onNewWaveClick={()=> { dispatch(startNewWave(scene)) }}

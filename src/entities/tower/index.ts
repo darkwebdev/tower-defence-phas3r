@@ -32,6 +32,7 @@ abstract class Tower extends GameObjects.GameObject{
   scene: Scene;
   base: GameObjects.Sprite;
   gun: GameObjects.Sprite;
+  coverageArea: GameObjects.Arc;
   radius: number;
   dps: number;
   price: number;
@@ -47,14 +48,18 @@ abstract class Tower extends GameObjects.GameObject{
     this.price = price;
     this.name = name;
     this.angleOffset = angleOffset;
-
+    this.coverageArea = this.scene.add
+      .circle(x, y, radius, 0x00ff00, 0.2)
+      .setStrokeStyle(1, 0x00ff00)
+      .setVisible(false);
     this.base = this.scene.add.sprite(x, y, baseTexture, baseFrame);
     this.gun = this.scene.add.sprite(x, y, gunTexture, gunFrame);
     this.gun.setDepth(1);
     
-    this.scene.physics.world.enable(this.base);
+    // this.scene.physics.world.enable(this.base);
 
     this.init();
+    console.log('TOWER', this)
   }
   
   init() {
