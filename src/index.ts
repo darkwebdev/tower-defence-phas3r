@@ -39,6 +39,7 @@ const game = new Game({
       [
         ActionTypes.HP_UPDATED,
         ActionTypes.MONEY_UPDATED,
+        ActionTypes.SHOW_TOWER_CONTROLS,
       ].forEach(type => {
         scene.events.on(type, payload => {
           store.dispatch({ type, payload });

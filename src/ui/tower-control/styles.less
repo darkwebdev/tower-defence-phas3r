@@ -1,13 +1,14 @@
-ui-control {
+ui-tower-control {
   position: fixed;
   display: flex;
   justify-content: space-between;
-  top: calc(640px - 50px);
+  align-items: center;
+  top: calc(640px - 100px);
   left: 0;
   right: calc(100% - 640px);
   background: rgba(255,255,255, .5);
   
   &[hidden="true"] {
-    left: calc(640px - 50px);
+    display: none;
   }
 }

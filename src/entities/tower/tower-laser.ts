@@ -35,4 +35,9 @@ export default class LaserTower extends Tower {
     // console.log('Engaging the enemy', this.name, enemy.name)
     this.target = enemy;
   }
+  
+  onDestroy(this: LaserTower & GameObjects.GameObject) {
+    console.log('LASER TOWER DESTROY')
+    this.laser.destroy();
+  }
 }

@@ -27,23 +27,19 @@ type Props = {
   onShowButtonClick: () => void;
 }
 
-export default class Control extends React.Component<Props> {
-  
-  render() {
-    const p = this.props;
-    
-    return (
-      <ui-control hidden={p.hidden}>
-        <button hidden={p.hidden} onClick={p.onMenuButtonClick}>Menu</button>
-        
-        <button hidden={p.hidden} disabled={p.isBulletTowerDisabled} onClick={p.onBulletTowerButtonClick}>Bullet Tower ${p.bulletTowerPrice}</button>
-        <button hidden={p.hidden} disabled={p.isLaserTowerDisabled} onClick={p.onLaserTowerButtonClick}>Laser Tower ${p.laserTowerPrice}</button>
-        
-        <button hidden={p.hidden} onClick={p.onNewWaveClick}>New wave</button>
-        
-        <button hidden={p.hidden} onClick={p.onHideButtonClick}>Hide</button>
-        <button hidden={!p.hidden} onClick={p.onShowButtonClick}>Show</button>
-      </ui-control>
-    );
-  }
-}
+const Control:React.SFC<Props> = (p: Props) =>
+  <ui-control hidden={p.hidden}>
+    <button hidden={p.hidden} onClick={p.onMenuButtonClick}>Menu</button>
+
+    <button hidden={p.hidden} disabled={p.isBulletTowerDisabled} onClick={p.onBulletTowerButtonClick}>Bullet Tower
+      ${p.bulletTowerPrice}</button>
+    <button hidden={p.hidden} disabled={p.isLaserTowerDisabled} onClick={p.onLaserTowerButtonClick}>Laser Tower
+      ${p.laserTowerPrice}</button>
+
+    <button hidden={p.hidden} onClick={p.onNewWaveClick}>New wave</button>
+
+    <button hidden={p.hidden} onClick={p.onHideButtonClick}>Hide</button>
+    <button hidden={!p.hidden} onClick={p.onShowButtonClick}>Show</button>
+  </ui-control>
+
+export default Control;

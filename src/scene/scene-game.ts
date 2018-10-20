@@ -68,7 +68,7 @@ export default class SceneGame extends Scene {
     this.createTowers();
     this.createEnemies();
 
-    this.attachKeyHandlers();
+    this.attachInputHandlers();
     this.attachEventHandlers();
   }
 
@@ -249,6 +249,16 @@ export default class SceneGame extends Scene {
     }
   }
   
+  selectTower(this: SceneGame & Scene, tower: Tower) {
+    tower.showCoverage();
+  }
+  
+  deselectAllTowers(this: SceneGame & Scene) {
+    this.towers.getChildren().forEach((tower: Tower) => {
+      tower.hideCoverage();
+    })
+  }
+  
   isBuildableTile(this: SceneGame & Scene, tile: Tilemaps.Tile): boolean {
     if (!tile || tile.index !== 2) return false;
 
@@ -280,13 +290,28 @@ export default class SceneGame extends Scene {
 
   attachEventHandlers(this: SceneGame & Scene) {
     this.events.on(ActionTypes.ADD_TOWER, (type: TowerTypes) => {
-      console.log('Entering add-tower mode...', type)
       this.enterAddTowerMode(type);
     });
 
     this.events.on(ActionTypes.TOWER_ADDED, () => {
-      console.log('Entering add-tower mode...')
       this.exitAddTowerMode();
+    });
+
+    this.events.on(ActionTypes.SELECT_TOWER, (tower: Tower) => {
+      this.deselectAllTowers();
+      this.selectTower(tower);
+      this.events.emit(ActionTypes.SHOW_TOWER_CONTROLS, tower);
+    });
+
+    this.events.on(ActionTypes.UPGRADE_TOWER, (tower: Tower) => {
+      tower.upgrade();
+      this.changeMoney(-tower.price);//todo: upgradePrice
+    });
+
+    this.events.on(ActionTypes.SELL_TOWER, (tower: Tower) => {
+      this.deselectAllTowers();
+      this.changeMoney(tower.price/2);//todo: sellPrice
+      tower.remove();
     });
 
     this.events.on(ActionTypes.NEW_WAVE, () => {
@@ -295,7 +320,7 @@ export default class SceneGame extends Scene {
     });
   }
   
-  attachKeyHandlers(this: SceneGame & Scene) {
+  attachInputHandlers(this: SceneGame & Scene) {
     this.input.keyboard.on('keydown', event => {
       switch(event.code) {
         case 'Escape':

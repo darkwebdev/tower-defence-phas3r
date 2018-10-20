@@ -21,6 +21,15 @@ export default function (state: State, action: AnyAction): State {
     case ActionTypes.SHOW_PANEL:
       return { ...state, panelVisible: true };
 
+    case ActionTypes.SHOW_TOWER_CONTROLS:
+      return { ...state, towerControlsVisible: true, activeTower: action.payload };
+
+    case ActionTypes.HIDE_TOWER_CONTROLS:
+      return { ...state, towerControlsVisible: false };
+    
+    case ActionTypes.SELL_TOWER:
+      return { ...state, towerControlsVisible: false };
+
     case ActionTypes.RESUME:
       return { ...state, gamePaused: false, menuVisible: false };
 

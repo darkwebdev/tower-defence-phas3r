@@ -61,4 +61,9 @@ export default class BulletTower extends Tower {
       // console.log(`Bullets pool: ${this.bullets.getLength()} / ${this.bullets.maxSize}`)
     }
   }
+
+  onDestroy(this: BulletTower & GameObjects.GameObject) {
+    console.log('BULLET TOWER DESTROY')
+    this.bullets.destroy(true);
+  }
 }

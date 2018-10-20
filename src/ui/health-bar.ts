@@ -19,7 +19,7 @@ export default class HealthBar extends GameObjects.GameObject {
   constructor(scene, maxValue, x, y) {
     super(scene, 'health-bar');
     
-    console.log('HEALTH', x, y)
+    // console.log('HEALTH', x, y)
     
     this.bar = new GameObjects.Graphics(scene);
 
