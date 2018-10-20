@@ -2,7 +2,7 @@ import { Scenes } from 'phaser'
 import { action } from 'typesafe-actions'
 import { AnyAction } from 'redux';
 
-import Tower, { TowerTypes } from './entities/tower';
+import Tower, { TowerTypes } from '../entities/tower';
 
 export const enum ActionTypes {
   SHOW_MENU = 'show-menu',

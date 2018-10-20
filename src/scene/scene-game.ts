@@ -2,7 +2,7 @@ import { Curves, GameObjects, Math as PMath, Physics, Scene, Tilemaps } from 'ph
 import Enemy, { EnemyProps } from '../entities/enemy'
 import BulletTower from '../entities/tower/tower-bullet'
 import LaserTower from '../entities/tower/tower-laser'
-import { ActionTypes } from '../actions';
+import { ActionTypes } from '../store/actions';
 import Tower, { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
 

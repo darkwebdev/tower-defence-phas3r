@@ -1,6 +1,6 @@
 import { GameObjects, Math as PMath, Scene } from 'phaser'
 import Enemy from '../enemy'
-import { ActionTypes } from '../../actions';
+import { ActionTypes } from '../../store/actions';
 
 export const enum TowerTypes {
   TOWER_BULLET = 'tower-bullet',

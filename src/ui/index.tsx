@@ -7,7 +7,7 @@ import {
   addTower, upgradeTower, sellTower,
   hideControl, restartGame, resumeGame, showMenu, showControl,
   startNewWave
-} from '../actions'
+} from '../store/actions'
 import { TowerTypes } from '../entities/tower';
 import config from '../config';
 import Menu from './menu'

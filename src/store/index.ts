@@ -1,5 +1,5 @@
 import { createStore, Reducer, Store } from 'redux';
-import Tower from './entities/tower';
+import Tower from '../entities/tower';
 
 export type State = {
   gameStarted: boolean;

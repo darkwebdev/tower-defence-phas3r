@@ -2,9 +2,9 @@ import { render } from 'react-dom'
 import { AUTO, Game, Scene } from 'phaser'
 import SceneGame, { SCENE_KEY } from './scene/scene-game'
 import UI from './ui'
-import Store, { State } from './store'
-import reducer from './reducer'
-import { ActionTypes, showMenu } from './actions';
+import Store, { State } from './store/'
+import reducer from './store/reducer'
+import { ActionTypes, showMenu } from './store/actions';
 
 let scene: Scene;
 

@@ -1,5 +1,5 @@
 import { AnyAction } from 'redux';
-import { State, initialState } from './store';
+import { State, initialState } from '.';
 import { ActionTypes } from './actions';
 
 export default function (state: State, action: AnyAction): State {
