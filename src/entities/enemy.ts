@@ -74,6 +74,14 @@ export default class Enemy extends GameObjects.GameObject {
     // console.log('hp', this.hp, this.name)
   }
   
+  addCollider(subject: GameObjects.GameObject, onOverlap: (enemy: Enemy) => void) {
+    this.collider = this.scene.physics.add.overlap(
+      this.sprite,
+      subject,
+      onOverlap.bind(this.scene, this)
+    );
+  }
+  
   onEnterHome() {
     console.log('I am home', this.name)
   }

@@ -157,13 +157,7 @@ export default class SceneGame extends Scene {
   
   onEnemySpawn(this: Scene & SceneGame, enemy: Enemy) {
     console.log('Enemy spawned', enemy.name)
-    enemy.collider = this.physics.add.overlap(
-      enemy,
-      this.home,
-      this.onEnemyEnter,
-      undefined,
-      this
-    );
+    enemy.addCollider(this.home, this.onEnemyEnter);
   }
   
   onEnemyEnter(enemy: Enemy) {
