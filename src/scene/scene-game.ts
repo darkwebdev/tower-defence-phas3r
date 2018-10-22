@@ -5,6 +5,7 @@ import LaserTower from '../entities/tower/tower-laser'
 import { ActionTypes } from '../store/actions';
 import Tower, { TowerProps, TowerTypes } from '../entities/tower';
 import { Config } from '../config';
+import attachEvents from './events';
 
 export const SCENE_KEY = 'scene-game';
 const ENEMIES_INTERVAL_MS = 2000;
@@ -68,8 +69,7 @@ export default class SceneGame extends Scene {
     this.createTowers();
     this.createEnemies();
 
-    this.attachInputHandlers();
-    this.attachEventHandlers();
+    attachEvents(this);
   }
 
   update(time: number, delta: number) {
@@ -286,49 +286,6 @@ export default class SceneGame extends Scene {
   changeMoney(this: SceneGame & Scene, delta: number) {
     this.money += delta;
     this.events.emit(ActionTypes.MONEY_UPDATED, this.money);
-  }
-
-  attachEventHandlers(this: SceneGame & Scene) {
-    this.events.on(ActionTypes.ADD_TOWER, (type: TowerTypes) => {
-      this.enterAddTowerMode(type);
-    });
-
-    this.events.on(ActionTypes.TOWER_ADDED, () => {
-      this.exitAddTowerMode();
-    });
-
-    this.events.on(ActionTypes.SELECT_TOWER, (tower: Tower) => {
-      this.deselectAllTowers();
-      this.selectTower(tower);
-      this.events.emit(ActionTypes.SHOW_TOWER_CONTROLS, tower);
-    });
-
-    this.events.on(ActionTypes.UPGRADE_TOWER, (tower: Tower) => {
-      tower.upgrade();
-      this.changeMoney(-tower.price);//todo: upgradePrice
-    });
-
-    this.events.on(ActionTypes.SELL_TOWER, (tower: Tower) => {
-      this.deselectAllTowers();
-      this.changeMoney(tower.price/2);//todo: sellPrice
-      tower.remove();
-    });
-
-    this.events.on(ActionTypes.NEW_WAVE, () => {
-      console.log('New wave coming...')
-      this.spawnWave();
-    });
-  }
-  
-  attachInputHandlers(this: SceneGame & Scene) {
-    this.input.keyboard.on('keydown', event => {
-      switch(event.code) {
-        case 'Escape':
-          console.log('ESC');
-          this.events.emit(ActionTypes.SHOW_MENU);
-          break;
-      }
-    });
   }
 }
 
